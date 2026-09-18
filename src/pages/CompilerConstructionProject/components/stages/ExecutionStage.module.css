@@ -1,0 +1,83 @@
+.terminalBody {
+  flex: 1;
+  min-height: 0;
+  background: #0d1117;
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #e2e8f0;
+}
+
+.line {
+  margin-bottom: 0.15rem;
+}
+
+.prompt {
+  color: #818cf8;
+  font-weight: 700;
+}
+
+.command {
+  color: #4ade80;
+  font-weight: 500;
+}
+
+.outputLine {
+  color: #e2e8f0;
+  padding-left: 0.25rem;
+  margin-bottom: 0.15rem;
+}
+
+.emptyLine {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+  padding-left: 0.25rem;
+}
+
+.returnCode {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  background: #4ade80;
+  vertical-align: text-bottom;
+  animation: termBlink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+@keyframes termBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Terminal scrollbar */
+.terminalBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminalBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.terminalBody::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0.75rem 1rem;
+  }
+  .infoArea {
+    padding: 0.75rem 1rem;
+  }
+  .tokensArea, .treeContainer, .symbolTable, .irCode, .blocksArea, .codeArea, .terminalBody {
+    padding: 0.75rem !important;
+  }
+}

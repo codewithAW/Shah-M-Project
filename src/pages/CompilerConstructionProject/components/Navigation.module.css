@@ -1,0 +1,242 @@
+.navContainer {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  padding: 0.5rem 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.mobileNavToggle {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.stages {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stageItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  transition: var(--transition-fast);
+  opacity: 0.6;
+  position: relative;
+}
+
+.stageItem:hover {
+  opacity: 1;
+  background: var(--panel-bg);
+}
+
+.stageItem.active {
+  opacity: 1;
+  background: var(--item-bg);
+  box-shadow: 0 4px 12px var(--shadow-color-lg);
+  color: var(--primary);
+}
+
+.stageIcon {
+  margin-bottom: 0.25rem;
+  color: inherit;
+}
+
+.stageNumber {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.5rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.active .stageNumber {
+  color: var(--primary);
+}
+
+.stageName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.connector {
+  width: 1rem;
+  height: 2px;
+  background: rgba(100, 116, 139, 0.2);
+  margin: 0 0.25rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.slideBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.slideBtn:hover {
+  background: var(--item-bg-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  color: var(--primary);
+}
+
+.slideBtnActive {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}
+.slideBtnActive:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.themeToggle {
+  padding: 0.75rem;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  color: var(--text-muted);
+  transition: var(--transition-fast);
+  border: none;
+  cursor: pointer;
+}
+
+.themeToggle:hover {
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+/* MEDIA QUERIES GO AT THE END */
+
+@media (max-width: 1024px) {
+  .navContainer {
+    padding: 1rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  
+  .header {
+    flex: 1;
+    text-align: center;
+    margin: 0 1rem;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .subtitle {
+    display: none; /* Hide subtitle on mobile for space */
+  }
+
+  .mobileNavToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    order: -1; /* Ensure it's on the left */
+  }
+  
+  .stages, .actions {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    order: 4; /* Below the top bar */
+  }
+  
+  .mobileMenuOpen .stages,
+  .mobileMenuOpen .actions {
+    display: flex;
+  }
+
+  .stageItem {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .stageIcon {
+    margin-bottom: 0;
+  }
+
+  .connector {
+    display: none;
+  }
+
+  .actions {
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .slideBtn {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .stageItem {
+    padding: 0.75rem 1rem;
+  }
+  .stageName {
+    font-size: 0.85rem;
+  }
+  .header {
+    margin: 0;
+  }
+}

@@ -1,0 +1,126 @@
+.container {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+.header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.sectionTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
+}
+
+.tableContainer {
+  background: var(--item-bg);
+  border-radius: 12px;
+  border: 1px solid var(--item-border);
+  overflow-y: auto;
+  max-height: 240px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.symbolTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.symbolTable th, .symbolTable td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--item-border);
+}
+
+.symbolTable th {
+  background: var(--item-bg-hover);
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.symbolTable td {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  color: var(--text-main);
+}
+
+.checksList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.checkItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--item-bg);
+  border-radius: 8px;
+  border: 1px solid var(--item-border);
+  box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.checkName {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-main);
+}
+
+.infoArea {
+  padding: 1rem 1.5rem;
+  background: var(--panel-bg);
+  border-top: 1px solid var(--panel-border);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0.75rem 1rem;
+  }
+  .infoArea {
+    padding: 0.75rem 1rem;
+  }
+  .tokensArea, .treeContainer, .symbolTable, .irCode, .blocksArea, .codeArea, .terminalBody {
+    padding: 0.75rem !important;
+  }
+}

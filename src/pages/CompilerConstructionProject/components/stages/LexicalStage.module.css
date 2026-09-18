@@ -1,0 +1,105 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+.header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tokenList {
+  flex: 1;
+  padding: 1rem 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.tokenRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--item-bg);
+  border-radius: 12px;
+  border: 1px solid var(--item-border);
+  box-shadow: 0 2px 4px var(--shadow-color);
+  transition: all 0.2s ease;
+}
+
+.tokenRow:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.tokenValue {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(0,0,0,0.1);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+.tokenType {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.infoArea {
+  padding: 1rem 1.5rem;
+  background: var(--panel-bg);
+  border-top: 1px solid var(--panel-border);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Scrollbar specific to token list */
+.tokenList::-webkit-scrollbar {
+  width: 6px;
+}
+.tokenList::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tokenList::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0.75rem 1rem;
+  }
+  .infoArea {
+    padding: 0.75rem 1rem;
+  }
+  .tokensArea, .treeContainer, .symbolTable, .irCode, .blocksArea, .codeArea, .terminalBody {
+    padding: 0.75rem !important;
+  }
+}

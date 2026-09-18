@@ -1,0 +1,166 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+.header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.treeContainer {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+}
+
+.treeScaler {
+  transform-origin: top center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+}
+
+
+.astNode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.nodeBox {
+  background: var(--item-bg);
+  border: 1px solid var(--primary-light);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  font-weight: 600;
+  color: var(--text-main);
+  text-align: center;
+  min-width: 100px;
+  z-index: 2;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nodeBox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--shadow-color-lg);
+  border-color: var(--primary);
+}
+
+.nodeType {
+  font-size: 0.7rem;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.15rem;
+}
+
+.nodeValue {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+}
+
+/* ── Vertical line from parent nodeBox DOWN to the horizontal branch ── */
+.connector {
+  width: 2px;
+  height: 1.25rem;
+  background: rgba(79, 70, 229, 0.4);
+  flex-shrink: 0;
+}
+
+/* ── Children row container ── */
+.childrenContainer {
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Each child wrapped in a branch ── */
+.childBranch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 0 0.4rem;
+  padding-top: 2px; /* room for the horizontal line */
+}
+
+/* Horizontal line segment on each child branch.
+   First child: only right half. Last child: only left half.
+   This guarantees the bar spans exactly center-to-center. */
+.childBranch::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(79, 70, 229, 0.4);
+}
+
+.childBranch:first-child::before {
+  left: 50%;
+}
+
+.childBranch:last-child::before {
+  right: 50%;
+}
+
+.childBranch:only-child::before {
+  display: none;
+}
+
+/* ── Vertical line from horizontal branch DOWN to child node ── */
+.branchLine {
+  width: 2px;
+  height: 1.25rem;
+  background: rgba(79, 70, 229, 0.4);
+  flex-shrink: 0;
+}
+
+.infoArea {
+  padding: 1rem 1.5rem;
+  background: var(--panel-bg);
+  border-top: 1px solid var(--panel-border);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0.75rem 1rem;
+  }
+  .infoArea {
+    padding: 0.75rem 1rem;
+  }
+  .tokensArea, .treeContainer, .symbolTable, .irCode, .blocksArea, .codeArea, .terminalBody {
+    padding: 0.75rem !important;
+  }
+}
