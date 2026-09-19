@@ -1,5 +1,6 @@
 import { supabase } from './supabase/client';
 import type { Quiz, QuizQuestion, QuizQuestionOption } from '../types';
+import { API_BASE } from '../config';
 
 export const quizService = {
   // Quizzes
@@ -163,7 +164,7 @@ export const quizService = {
     const token = session.data.session?.access_token;
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch('/api/quiz/start', {
+    const response = await fetch(`${API_BASE}/api/quiz/start`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -226,7 +227,7 @@ export const quizService = {
     const token = session.data.session?.access_token;
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch(`/api/quiz/attempt/${attemptId}`, {
+    const response = await fetch(`${API_BASE}/api/quiz/attempt/${attemptId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -245,7 +246,7 @@ export const quizService = {
     const token = session.data.session?.access_token;
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch('/api/quiz/submit', {
+    const response = await fetch(`${API_BASE}/api/quiz/submit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -268,7 +269,7 @@ export const quizService = {
     if (!token) return;
 
     try {
-      await fetch('/api/quiz/integrity-event', {
+      await fetch(`${API_BASE}/api/quiz/integrity-event`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -290,7 +291,7 @@ export const quizService = {
     const token = session.data.session?.access_token;
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch('/api/quiz/cheating', {
+    const response = await fetch(`${API_BASE}/api/quiz/cheating`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

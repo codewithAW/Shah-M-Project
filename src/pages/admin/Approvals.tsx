@@ -8,6 +8,7 @@ import { GlassInput } from '../../components/ui/GlassInput';
 import { Check, X, KeyRound, AlertCircle, UserPlus, Users, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Swal from 'sweetalert2';
+import { API_BASE } from '../../config';
 
 
 export function Approvals() {
@@ -89,7 +90,7 @@ export function Approvals() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/auth/approve-reset', {
+      const response = await fetch(`${API_BASE}/api/auth/approve-reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +151,7 @@ export function Approvals() {
 
   const handleApproveStudent = async (studentId: string) => {
     try {
-      const response = await fetch('/api/auth/approve-student', {
+      const response = await fetch(`${API_BASE}/api/auth/approve-student`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -184,7 +185,7 @@ export function Approvals() {
     if (!result.isConfirmed) return;
     
     try {
-      const response = await fetch('/api/auth/reject-student', {
+      const response = await fetch(`${API_BASE}/api/auth/reject-student`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import { supabase } from './supabase/client';
 import type { Resource } from '../types';
+import { API_BASE } from '../config';
 
 export const resourceService = {
   // Get all resources for a course
@@ -71,7 +72,7 @@ export const resourceService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('/api/drive/upload', {
+    const response = await fetch(`${API_BASE}/api/drive/upload`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -96,7 +97,7 @@ export const resourceService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('/api/drive/upload/student', {
+    const response = await fetch(`${API_BASE}/api/drive/upload/student`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -119,7 +120,7 @@ export const resourceService = {
     
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch(`/api/drive/delete/${driveFileId}`, {
+    const response = await fetch(`${API_BASE}/api/drive/delete/${driveFileId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`

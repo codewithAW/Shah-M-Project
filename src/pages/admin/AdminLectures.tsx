@@ -11,6 +11,7 @@ import { driveService } from '../../services/googleDrive/driveService';
 import { supabase } from '../../services/supabase/client';
 import type { Course, Lecture } from '../../types';
 import Swal from 'sweetalert2';
+import { API_BASE } from '../../config';
 
 
 export function AdminLectures() {
@@ -136,12 +137,12 @@ export function AdminLectures() {
         const uploadRes = await driveService.uploadFile(thumbnailFile);
         if (uploadRes.success && uploadRes.file) {
           finalDriveFileId = uploadRes.file.id;
-          finalThumbnailUrl = `/api/drive/image/${uploadRes.file.id}`;
+          finalThumbnailUrl = `${API_BASE}/api/drive/image/${uploadRes.file.id}`;
 
           // Delete the old image from Google Drive if replacing an existing one
           if (editingLecture?.drive_file_id) {
             try {
-              await fetch(`/api/drive/delete/${editingLecture.drive_file_id}`, {
+              await fetch(`${API_BASE}/api/drive/delete/${editingLecture.drive_file_id}`, {
                 method: 'DELETE',
                 headers: {
                   'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`

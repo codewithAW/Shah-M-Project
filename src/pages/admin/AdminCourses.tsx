@@ -11,6 +11,7 @@ import { driveService } from '../../services/googleDrive/driveService';
 import { supabase } from '../../services/supabase/client';
 import type { Course, CourseCategory, CourseStatus } from '../../types';
 import Swal from 'sweetalert2';
+import { API_BASE } from '../../config';
 
 
 export function AdminCourses() {
@@ -119,12 +120,12 @@ export function AdminCourses() {
         if (uploadRes.success && uploadRes.file) {
           finalDriveFileId = uploadRes.file.id;
           // Store the secure proxy route in the DB instead of a public Drive link
-          finalThumbnailUrl = `/api/drive/image/${uploadRes.file.id}`;
+          finalThumbnailUrl = `${API_BASE}/api/drive/image/${uploadRes.file.id}`;
 
           // Delete the old image from Google Drive if replacing an existing one
           if (editingCourse?.drive_file_id) {
             try {
-              await fetch(`/api/drive/delete/${editingCourse.drive_file_id}`, {
+              await fetch(`${API_BASE}/api/drive/delete/${editingCourse.drive_file_id}`, {
                 method: 'DELETE',
                 headers: {
                   'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`

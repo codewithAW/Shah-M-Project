@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Hash, KeyRound } from 'lucide-react';
 import { GlassInput } from '../../components/ui/GlassInput';
 import { GlassButton } from '../../components/ui/GlassButton';
+import { API_BASE } from '../../config';
 
 export function ForgotPassword() {
   const [rollNumber, setRollNumber] = useState('');
@@ -17,7 +18,7 @@ export function ForgotPassword() {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/reset-password-request', {
+      const response = await fetch(`${API_BASE}/api/auth/reset-password-request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

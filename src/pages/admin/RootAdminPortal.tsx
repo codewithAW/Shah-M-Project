@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../services/supabase/client';
+import { API_BASE } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
 import { GlassCard } from '../../components/ui/GlassCard';
 import { GlassButton } from '../../components/ui/GlassButton';
@@ -54,7 +55,7 @@ export function RootAdminPortal() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/auth/create-teacher', {
+      const response = await fetch(`${API_BASE}/api/auth/create-teacher`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +112,7 @@ export function RootAdminPortal() {
         endpoint = '/api/auth/delete-teacher';
       }
 
-      const response = await fetch(`${endpoint}`, {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

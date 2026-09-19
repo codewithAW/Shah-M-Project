@@ -13,15 +13,19 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import fs from 'fs';
 
-// Load env vars from the root .env file (skip in Vercel)
-if (!process.env.VERCEL) {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Load env vars from the root .env file (if running locally)
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+if (fs.existsSync(path.resolve(__dirname, '../.env'))) {
   dotenv.config({ path: path.resolve(__dirname, '../.env') });
 }
 
 const app = express();
 app.use(helmet()); // Enforce strict security headers
-app.use(cors());
+
+// Configure CORS for production Vercel frontend and local development
+const allowedOrigins = process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, 'http://localhost:5173'] : '*';
+app.use(cors({ origin: allowedOrigins, credentials: true }));
+
 app.use(express.json());
 
 // Set up rate limiters
@@ -1504,11 +1508,7 @@ app.post('/api/quiz/integrity-event', requireStudent, async (req, res) => {
   }
 });
 
-if (!process.env.VERCEL) {
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`Server API listening on port ${PORT}`);
-  });
-}
-
-export default app;
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server API listening on port ${PORT}`);
+});

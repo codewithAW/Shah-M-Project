@@ -1,4 +1,5 @@
 import { supabase } from './supabase/client';
+import { API_BASE } from '../config';
 
 export interface QuizGenerationParams {
   topic: string;
@@ -15,7 +16,7 @@ export const aiService = {
     
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch('/api/ai/generate-quiz', {
+    const response = await fetch(`${API_BASE}/api/ai/generate-quiz`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,7 +39,7 @@ export const aiService = {
     
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch('/api/ai/generate-quiz/compiler', {
+    const response = await fetch(`${API_BASE}/api/ai/generate-quiz/compiler`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -61,7 +62,7 @@ export const aiService = {
     
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch('/api/ai/generate-quiz-from-file', {
+    const response = await fetch(`${API_BASE}/api/ai/generate-quiz-from-file`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`

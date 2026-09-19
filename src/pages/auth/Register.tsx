@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Lock, BookOpen, Hash } from 'lucide-react';
 import { GlassInput } from '../../components/ui/GlassInput';
 import { GlassButton } from '../../components/ui/GlassButton';
+import { API_BASE } from '../../config';
 
 export function Register() {
   const [name, setName] = useState('');
@@ -28,7 +29,7 @@ export function Register() {
     }
 
     try {
-      const response = await fetch('/api/auth/register-student', {
+      const response = await fetch(`${API_BASE}/api/auth/register-student`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,4 +1,5 @@
 import { supabase } from '../supabase/client';
+import { API_BASE } from '../../config';
 
 export const driveService = {
   async uploadFile(file: File) {
@@ -10,7 +11,7 @@ export const driveService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('/api/drive/upload', {
+    const response = await fetch(`${API_BASE}/api/drive/upload`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
