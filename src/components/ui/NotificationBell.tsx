@@ -67,16 +67,17 @@ export function NotificationBell() {
   if (!profile) return null;
 
   return (
-    <div className="relative">
+    <div className="relative" style={{ position: 'relative' }}>
       <GlassButton 
         variant="ghost" 
         size="sm" 
         className="relative h-9 w-9 rounded-full p-0"
+        style={{ position: 'relative' }}
         onClick={() => setIsOpen(!isOpen)}
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-error text-[10px] font-bold flex items-center justify-center text-white ring-2 ring-background">
+          <span className="notification-bell-badge">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -87,44 +88,45 @@ export function NotificationBell() {
           <div 
             className="fixed inset-0 z-40" 
             onClick={() => setIsOpen(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 40 }}
           />
-          <GlassCard className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto z-50 p-0 shadow-2xl flex flex-col">
-            <div className="p-4 border-b border-glass-highlight flex justify-between items-center sticky top-0 bg-background/95 backdrop-blur-md z-10">
-              <h3 className="font-bold">Notifications</h3>
+          <GlassCard className="notification-dropdown">
+            <div className="notification-header">
+              <h3>Notifications</h3>
               {unreadCount > 0 && (
-                <button onClick={handleMarkAllRead} className="text-xs text-primary hover:underline font-medium">
+                <button onClick={handleMarkAllRead} className="notification-mark-read">
                   Mark all read
                 </button>
               )}
             </div>
             
-            <div className="flex-1 overflow-y-auto">
+            <div className="notification-list">
               {notifications.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground">
+                <div className="notification-empty">
                   <Bell className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                  <p className="text-sm">No notifications yet</p>
+                  <p>No notifications yet</p>
                 </div>
               ) : (
-                <div className="divide-y divide-glass-highlight/50">
+                <div>
                   {notifications.map(notif => (
                     <Link 
                       key={notif.id} 
                       to={notif.link || '#'} 
                       onClick={() => setIsOpen(false)}
-                      className={`block p-4 hover:bg-glass/50 transition-colors ${!notif.is_read ? 'bg-primary/5' : ''}`}
+                      className={`notification-item ${!notif.is_read ? 'is-unread' : ''}`}
                     >
-                      <div className="flex justify-between items-start gap-4">
+                      <div className="notification-item-layout">
                         <div>
-                          <h4 className="text-sm font-semibold text-foreground">{notif.title}</h4>
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{notif.message}</p>
-                          <p className="text-[10px] text-muted-foreground mt-2 opacity-70">
+                          <h4 className="notification-item-title">{notif.title}</h4>
+                          <p className="notification-item-message">{notif.message}</p>
+                          <p className="notification-item-date">
                             {new Date(notif.created_at).toLocaleDateString()}
                           </p>
                         </div>
                         {!notif.is_read && (
                           <button 
                             onClick={(e) => handleMarkAsRead(e, notif.id)}
-                            className="shrink-0 h-6 w-6 rounded-full bg-glass flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                            className="notification-item-check"
                             title="Mark as read"
                           >
                             <Check className="h-3 w-3" />
@@ -137,8 +139,8 @@ export function NotificationBell() {
               )}
             </div>
             
-            <div className="p-2 border-t border-glass-highlight sticky bottom-0 bg-background/95 backdrop-blur-md">
-              <Link to="/notifications" onClick={() => setIsOpen(false)}>
+            <div className="notification-footer">
+              <Link to="/notifications" onClick={() => setIsOpen(false)} style={{ textDecoration: 'none' }}>
                 <GlassButton variant="ghost" className="w-full text-xs h-8">
                   View All
                 </GlassButton>

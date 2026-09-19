@@ -1,0 +1,37 @@
+/* responsive.css */
+
+/* Media query helpers if needed beyond layout grid */
+
+@media (max-width: 767px) {
+  /* Mobile specific adjustments */
+  .hide-on-mobile {
+    display: none !important;
+  }
+  
+  .text-h1 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .text-h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  .text-h3 {
+    font-size: var(--font-size-lg);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Tablet specific adjustments */
+  .hide-on-tablet {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Desktop specific adjustments */
+  .hide-on-desktop {
+    display: none !important;
+  }
+}
+

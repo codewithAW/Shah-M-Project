@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from('admin')
         .select('*')
         .eq('auth_user_id', userId)
-        .single();
+        .maybeSingle();
         
       if (adminData && !adminError) {
         setProfile({

@@ -40,40 +40,41 @@ export function Courses() {
   });
 
   return (
-    <div className="space-y-12 py-8">
+    <div className="page-container" style={{ paddingTop: '5rem', paddingBottom: 'var(--space-12)' }}>
       {/* Header section */}
-      <div className="text-center max-w-3xl mx-auto space-y-4 relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl -z-10"></div>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Explore Courses</h1>
-        <p className="text-lg text-muted-foreground">Expand your knowledge with our expertly crafted educational content.</p>
+      <div style={{ textAlign: 'center', maxWidth: '48rem', margin: '0 auto var(--space-12)', position: 'relative' }}>
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '100%', height: '100%', background: 'rgba(99, 102, 241, 0.15)', borderRadius: 'var(--radius-full)', filter: 'blur(80px)', zIndex: -1, pointerEvents: 'none' }} />
+        <h1 className="text-h1" style={{ marginBottom: 'var(--space-4)' }}>Explore Courses</h1>
+        <p className="text-muted" style={{ fontSize: 'var(--font-size-lg)', lineHeight: 1.6 }}>Expand your knowledge with our expertly crafted educational content.</p>
       </div>
 
       {/* Search and Filter */}
-      <div className="max-w-4xl mx-auto">
-        <div className="glass-panel p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center shadow-lg">
-          <div className="w-full flex-1">
+      <div style={{ maxWidth: '56rem', margin: '0 auto var(--space-12)' }}>
+        <div className="glass-card" style={{ padding: 'var(--space-4)', borderRadius: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-4)', alignItems: 'center' }}>
+          <div style={{ flex: 1, minWidth: '200px' }}>
             <GlassInput 
               type="text" 
               placeholder="Search for courses, subjects, or topics..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              icon={<Search className="h-5 w-5" />}
-              className="h-12 text-lg"
+              icon={<Search style={{ height: '1.25rem', width: '1.25rem' }} />}
+              style={{ height: '3rem', fontSize: 'var(--font-size-base)' }}
             />
           </div>
-          <div className="flex gap-2 w-full md:w-auto">
+          <div style={{ display: 'flex', gap: 'var(--space-3)', width: '100%', flex: '1 1 300px' }}>
             <select 
-              className="h-12 px-4 rounded-xl border border-glass-highlight bg-glass/80 backdrop-blur-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary appearance-none flex-1 md:w-48"
+              className="form-input"
+              style={{ height: '3rem', flex: 1 }}
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
-              <option value="all" className="bg-background">All Categories</option>
+              <option value="all">All Categories</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id} className="bg-background">{cat.name}</option>
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
-            <GlassButton variant="secondary" className="h-12 px-6 shrink-0">
-              <Filter className="h-5 w-5 mr-2" />
+            <GlassButton variant="secondary" style={{ height: '3rem', padding: '0 var(--space-6)', flexShrink: 0 }}>
+              <Filter style={{ height: '1rem', width: '1rem', marginRight: 'var(--space-2)' }} />
               Filter
             </GlassButton>
           </div>
@@ -82,27 +83,27 @@ export function Courses() {
 
       {/* Course Grid */}
       {isLoading ? (
-        <div className="flex justify-center py-20">
-          <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '5rem 0' }}>
+          <div className="loading-spinner"></div>
         </div>
       ) : error ? (
-        <div className="text-center text-error p-8 glass-panel max-w-2xl mx-auto">{error}</div>
+        <div className="glass-card text-center text-danger" style={{ maxWidth: '42rem', margin: '0 auto', padding: 'var(--space-8)' }}>{error}</div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md-grid-cols-2 lg-grid-cols-3 gap-8">
             {filteredCourses.map(course => (
               <CourseCard key={course.id} course={course} />
             ))}
           </div>
 
           {filteredCourses.length === 0 && (
-            <div className="text-center py-20 text-muted-foreground glass-panel max-w-2xl mx-auto">
-              <BookOpen className="h-16 w-16 mx-auto mb-4 opacity-20" />
-              <h3 className="text-xl font-medium text-foreground mb-2">No courses found</h3>
+            <div className="glass-card text-center text-muted" style={{ maxWidth: '42rem', margin: '0 auto', padding: '5rem 0' }}>
+              <BookOpen style={{ height: '4rem', width: '4rem', margin: '0 auto var(--space-4)', opacity: 0.2 }} />
+              <h3 className="text-h4" style={{ marginBottom: 'var(--space-2)' }}>No courses found</h3>
               <p>We couldn't find any courses matching your search criteria.</p>
               <GlassButton 
                 variant="ghost" 
-                className="mt-6"
+                style={{ marginTop: 'var(--space-6)' }}
                 onClick={() => {
                   setSearchQuery('');
                   setSelectedCategory('all');

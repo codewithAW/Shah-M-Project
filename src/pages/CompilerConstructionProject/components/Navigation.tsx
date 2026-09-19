@@ -23,10 +23,21 @@ export const Navigation: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = savedTheme === 'dark' || (!savedTheme && systemDark);
+    setIsDarkMode(isDark);
+  }, []);
+
+  useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark'); // Keep for backward compatibility with its css
+      localStorage.setItem('theme', 'dark');
     } else {
+      document.documentElement.classList.remove('dark');
       document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
 

@@ -89,7 +89,7 @@ export function Approvals() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/approve-reset', {
+      const response = await fetch('/api/auth/approve-reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +117,18 @@ export function Approvals() {
   };
 
   const handleRejectPassword = async (requestId: string) => {
-    if (!window.confirm("Are you sure you want to reject this request?")) return;
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to reject this request?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: 'var(--color-primary)',
+      cancelButtonColor: 'var(--color-danger)',
+      confirmButtonText: 'Yes, reject it!',
+      background: 'var(--color-glass-bg)',
+      color: 'var(--color-foreground)'
+    });
+    if (!result.isConfirmed) return;
     
     try {
       const { error } = await supabase
@@ -139,7 +150,7 @@ export function Approvals() {
 
   const handleApproveStudent = async (studentId: string) => {
     try {
-      const response = await fetch('http://localhost:3001/api/auth/approve-student', {
+      const response = await fetch('/api/auth/approve-student', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,10 +170,21 @@ export function Approvals() {
   };
 
   const handleRejectStudent = async (studentId: string) => {
-    if (!window.confirm("Are you sure you want to reject and delete this registration request?")) return;
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to reject and delete this registration request?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: 'var(--color-primary)',
+      cancelButtonColor: 'var(--color-danger)',
+      confirmButtonText: 'Yes, reject it!',
+      background: 'var(--color-glass-bg)',
+      color: 'var(--color-foreground)'
+    });
+    if (!result.isConfirmed) return;
     
     try {
-      const response = await fetch('http://localhost:3001/api/auth/reject-student', {
+      const response = await fetch('/api/auth/reject-student', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +214,18 @@ export function Approvals() {
   };
 
   const handleRejectEnrollment = async (enrollmentId: string) => {
-    if (!window.confirm("Are you sure you want to reject this course enrollment?")) return;
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to reject this course enrollment?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: 'var(--color-primary)',
+      cancelButtonColor: 'var(--color-danger)',
+      confirmButtonText: 'Yes, reject it!',
+      background: 'var(--color-glass-bg)',
+      color: 'var(--color-foreground)'
+    });
+    if (!result.isConfirmed) return;
     try {
       await enrollmentService.rejectEnrollment(enrollmentId);
       setPendingEnrollments(pendingEnrollments.filter(e => e.id !== enrollmentId));
@@ -210,114 +243,94 @@ export function Approvals() {
   };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="dashboard-container">
+      <div className="dashboard-header">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Approvals</h1>
-          <p className="text-muted-foreground mt-1">Manage pending approvals.</p>
+          <h1 className="dashboard-title">Approvals</h1>
+          <p className="text-muted font-medium mt-1">Manage pending approvals.</p>
         </div>
       </div>
 
-      <div className="flex space-x-2 border-b border-glass-highlight pb-px overflow-x-auto">
+      <div className="tabs-container">
         <button
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-            activeTab === 'enrollments' 
-              ? 'border-primary text-primary' 
-              : 'border-transparent text-muted-foreground hover:text-foreground hover:border-glass-highlight'
-          }`}
+          className={`tab-btn ${activeTab === 'enrollments' ? 'active' : ''}`}
           onClick={() => setActiveTab('enrollments')}
         >
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            Course Enrollments
-            {pendingEnrollments.length > 0 && (
-              <span className="ml-1.5 inline-flex items-center justify-center rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
-                {pendingEnrollments.length}
-              </span>
-            )}
-          </div>
+          <BookOpen style={{ height: '1rem', width: '1rem' }} />
+          Course
+          {pendingEnrollments.length > 0 && (
+            <span className="tab-badge">{pendingEnrollments.length}</span>
+          )}
         </button>
         <button
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-            activeTab === 'students' 
-              ? 'border-primary text-primary' 
-              : 'border-transparent text-muted-foreground hover:text-foreground hover:border-glass-highlight'
-          }`}
+          className={`tab-btn ${activeTab === 'students' ? 'active' : ''}`}
           onClick={() => setActiveTab('students')}
         >
-          <div className="flex items-center gap-2">
-            <UserPlus className="h-4 w-4" />
-            New Students
-            {pendingStudents.length > 0 && (
-              <span className="ml-1.5 inline-flex items-center justify-center rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
-                {pendingStudents.length}
-              </span>
-            )}
-          </div>
+          <UserPlus style={{ height: '1rem', width: '1rem' }} />
+          New
+          {pendingStudents.length > 0 && (
+            <span className="tab-badge">{pendingStudents.length}</span>
+          )}
         </button>
         <button
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-            activeTab === 'passwords' 
-              ? 'border-primary text-primary' 
-              : 'border-transparent text-muted-foreground hover:text-foreground hover:border-glass-highlight'
-          }`}
+          className={`tab-btn ${activeTab === 'passwords' ? 'active' : ''}`}
           onClick={() => setActiveTab('passwords')}
         >
-          <div className="flex items-center gap-2">
-            <KeyRound className="h-4 w-4" />
-            Password Resets
-            {passwordRequests.length > 0 && (
-              <span className="ml-1.5 inline-flex items-center justify-center rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
-                {passwordRequests.length}
-              </span>
-            )}
-          </div>
+          <KeyRound style={{ height: '1rem', width: '1rem' }} />
+          Reset
+          {passwordRequests.length > 0 && (
+            <span className="tab-badge">{passwordRequests.length}</span>
+          )}
         </button>
       </div>
 
-      <GlassCard className="flex-1 p-6 relative overflow-hidden flex flex-col">
+      <GlassCard className="d-flex flex-col p-6 shadow-sm" style={{ flex: 1, overflow: 'auto', padding: '1.5rem' }}>
         {isLoading ? (
-          <div className="flex justify-center p-12"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>
+          <div className="d-flex items-center justify-center p-12"><div className="animate-spin h-8 w-8 rounded-full" style={{ border: '4px solid var(--color-primary)', borderTopColor: 'transparent' }}></div></div>
         ) : activeTab === 'enrollments' ? (
           pendingEnrollments.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-              <Check className="h-12 w-12 mb-4 opacity-20" />
-              <p>No pending course enrollments.</p>
+            <div className="empty-state" style={{ height: '100%', border: 'none', background: 'transparent' }}>
+              <div className="empty-state-icon">
+                <Check style={{ height: '3rem', width: '3rem', opacity: 0.5 }} />
+              </div>
+              <p className="empty-state-desc">No pending course enrollments.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="dashboard-grid cols-3" style={{ overflowY: 'auto', paddingRight: '0.5rem' }}>
               {pendingEnrollments.map((enrollment) => (
-                <GlassCard key={enrollment.id} className="p-5 flex flex-col">
-                  <div className="flex items-start justify-between mb-4">
+                <GlassCard key={enrollment.id} className="d-flex flex-col p-6 transition-all hover-bg-white-10 shadow-sm group">
+                  <div className="d-flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="font-semibold text-lg">{enrollment.profiles?.full_name}</h3>
-                      <p className="text-sm text-muted-foreground">Roll: {enrollment.profiles?.roll_number}</p>
-                      <div className="mt-2 p-2 bg-glass/30 rounded-lg border border-glass-highlight">
-                        <p className="text-sm font-medium">Course: {enrollment.courses?.title}</p>
+                      <h3 className="font-bold text-xl">{enrollment.profiles?.full_name}</h3>
+                      <p className="text-sm font-medium text-muted mt-1">Roll: {enrollment.profiles?.roll_number}</p>
+                      <div className="mt-3 p-3 rounded-xl border border-white/5" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                        <p className="text-sm font-bold">Course: {enrollment.courses?.title}</p>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2">
+                      <p className="text-xs font-medium text-muted mt-3">
                         Requested: {new Date(enrollment.created_at).toLocaleString()}
                       </p>
                     </div>
-                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
-                      <BookOpen className="h-4 w-4" />
+                    <div className="stat-icon text-primary" style={{ width: '3rem', height: '3rem', borderRadius: '1rem', flexShrink: 0 }}>
+                      <BookOpen style={{ height: '1.25rem', width: '1.25rem' }} />
                     </div>
                   </div>
 
-                  <div className="mt-auto flex gap-2 pt-4">
+                  <div className="d-flex gap-3 pt-6 border-t border-white/5" style={{ marginTop: 'auto' }}>
                     <GlassButton 
                       variant="primary" 
-                      className="flex-1"
+                      style={{ flex: 1 }}
+                      className="shadow-sm font-bold"
                       onClick={() => handleApproveEnrollment(enrollment.id)}
                     >
                       Approve
                     </GlassButton>
                     <GlassButton 
                       variant="danger" 
-                      className="flex-none px-3"
+                      className="shadow-sm"
+                      style={{ flexShrink: 0, padding: '0 1rem' }}
                       onClick={() => handleRejectEnrollment(enrollment.id)}
                     >
-                      <X className="h-4 w-4" />
+                      <X style={{ height: '1.25rem', width: '1.25rem' }} />
                     </GlassButton>
                   </div>
                 </GlassCard>
@@ -326,42 +339,46 @@ export function Approvals() {
           )
         ) : activeTab === 'students' ? (
           pendingStudents.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-              <Check className="h-12 w-12 mb-4 opacity-20" />
-              <p>No pending student registrations.</p>
+            <div className="empty-state" style={{ height: '100%', border: 'none', background: 'transparent' }}>
+              <div className="empty-state-icon">
+                <Check style={{ height: '3rem', width: '3rem', opacity: 0.5 }} />
+              </div>
+              <p className="empty-state-desc">No pending student registrations.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="dashboard-grid cols-3" style={{ overflowY: 'auto', paddingRight: '0.5rem' }}>
               {pendingStudents.map((student) => (
-                <GlassCard key={student.id} className="p-5 flex flex-col">
-                  <div className="flex items-start justify-between mb-4">
+                <GlassCard key={student.id} className="d-flex flex-col p-6 transition-all hover-bg-white-10 shadow-sm group">
+                  <div className="d-flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="font-semibold text-lg">{student.full_name}</h3>
-                      <p className="text-sm text-muted-foreground">Roll: {student.roll_number}</p>
-                      <p className="text-sm text-muted-foreground">Username: {student.username}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <h3 className="font-bold text-xl">{student.full_name}</h3>
+                      <p className="text-sm font-medium text-muted mt-1">Roll: {student.roll_number}</p>
+                      <p className="text-sm font-medium text-muted">Username: {student.username}</p>
+                      <p className="text-xs font-medium text-muted mt-3">
                         Registered: {new Date(student.created_at).toLocaleString()}
                       </p>
                     </div>
-                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                      <Users className="h-4 w-4" />
+                    <div className="stat-icon text-primary" style={{ width: '3rem', height: '3rem', borderRadius: '1rem', flexShrink: 0 }}>
+                      <Users style={{ height: '1.25rem', width: '1.25rem' }} />
                     </div>
                   </div>
 
-                  <div className="mt-auto flex gap-2 pt-4">
+                  <div className="d-flex gap-3 pt-6 border-t border-white/5" style={{ marginTop: 'auto' }}>
                     <GlassButton 
                       variant="primary" 
-                      className="flex-1"
+                      style={{ flex: 1 }}
+                      className="shadow-sm font-bold"
                       onClick={() => handleApproveStudent(student.id)}
                     >
                       Approve
                     </GlassButton>
                     <GlassButton 
                       variant="danger" 
-                      className="flex-none px-3"
+                      className="shadow-sm"
+                      style={{ flexShrink: 0, padding: '0 1rem' }}
                       onClick={() => handleRejectStudent(student.id)}
                     >
-                      <X className="h-4 w-4" />
+                      <X style={{ height: '1.25rem', width: '1.25rem' }} />
                     </GlassButton>
                   </div>
                 </GlassCard>
@@ -370,41 +387,45 @@ export function Approvals() {
           )
         ) : (
           passwordRequests.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-              <Check className="h-12 w-12 mb-4 opacity-20" />
-              <p>No pending password reset requests.</p>
+            <div className="empty-state" style={{ height: '100%', border: 'none', background: 'transparent' }}>
+              <div className="empty-state-icon">
+                <Check style={{ height: '3rem', width: '3rem', opacity: 0.5 }} />
+              </div>
+              <p className="empty-state-desc">No pending password reset requests.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="dashboard-grid cols-3" style={{ overflowY: 'auto', paddingRight: '0.5rem' }}>
               {passwordRequests.map((request) => (
-                <GlassCard key={request.id} className="p-5 flex flex-col">
-                  <div className="flex items-start justify-between mb-4">
+                <GlassCard key={request.id} className="d-flex flex-col p-6 transition-all hover-bg-white-10 shadow-sm group">
+                  <div className="d-flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="font-semibold text-lg">{request.profiles?.full_name}</h3>
-                      <p className="text-sm text-muted-foreground">Roll: {request.profiles?.roll_number}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <h3 className="font-bold text-xl">{request.profiles?.full_name}</h3>
+                      <p className="text-sm font-medium text-muted mt-1">Roll: {request.profiles?.roll_number}</p>
+                      <p className="text-xs font-medium text-muted mt-3">
                         Requested: {new Date(request.created_at).toLocaleString()}
                       </p>
                     </div>
-                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                      <KeyRound className="h-4 w-4" />
+                    <div className="stat-icon text-primary" style={{ width: '3rem', height: '3rem', borderRadius: '1rem', flexShrink: 0 }}>
+                      <KeyRound style={{ height: '1.25rem', width: '1.25rem' }} />
                     </div>
                   </div>
 
-                  <div className="mt-auto flex gap-2 pt-4">
+                  <div className="d-flex gap-3 pt-6 border-t border-white/5" style={{ marginTop: 'auto' }}>
                     <GlassButton 
                       variant="primary" 
-                      className="flex-1"
+                      style={{ flex: 1 }}
+                      className="shadow-sm font-bold"
                       onClick={() => setSelectedRequest(request)}
                     >
                       Approve
                     </GlassButton>
                     <GlassButton 
                       variant="danger" 
-                      className="flex-none px-3"
+                      className="shadow-sm"
+                      style={{ flexShrink: 0, padding: '0 1rem' }}
                       onClick={() => handleRejectPassword(request.id)}
                     >
-                      <X className="h-4 w-4" />
+                      <X style={{ height: '1.25rem', width: '1.25rem' }} />
                     </GlassButton>
                   </div>
                 </GlassCard>
@@ -415,31 +436,32 @@ export function Approvals() {
       </GlassCard>
 
       {/* Approval Modal */}
+      {/* Approval Modal */}
       <AnimatePresence>
         {selectedRequest && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="modal-overlay">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md"
+              style={{ width: '100%', maxWidth: '28rem' }}
             >
-              <GlassCard className="p-6">
-                <h2 className="text-xl font-bold mb-2">Reset Password</h2>
-                <p className="text-sm text-muted-foreground mb-6">
+              <GlassCard className="modal-content">
+                <h2 className="modal-title">Reset Password</h2>
+                <p className="text-sm font-medium text-muted mb-6">
                   Set a new password for {selectedRequest.profiles?.full_name} ({selectedRequest.profiles?.roll_number}).
                 </p>
 
                 {error && (
-                  <div className="mb-4 p-3 rounded-lg bg-error/10 border border-error/20 flex items-start gap-2 text-error text-sm">
-                    <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-                    <span>{error}</span>
+                  <div className="p-4 rounded-xl d-flex items-start gap-3 text-sm mb-6" style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                    <AlertCircle style={{ height: '1.25rem', width: '1.25rem', flexShrink: 0 }} />
+                    <span className="font-bold">{error}</span>
                   </div>
                 )}
 
-                <form onSubmit={handleApprovePassword} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5 ml-1">New Password</label>
+                <form onSubmit={handleApprovePassword} className="d-flex flex-col gap-5">
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">New Password</label>
                     <GlassInput 
                       type="password" 
                       placeholder="••••••••" 
@@ -448,8 +470,8 @@ export function Approvals() {
                       onChange={e => setNewPassword(e.target.value)}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5 ml-1">Confirm New Password</label>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">Confirm New Password</label>
                     <GlassInput 
                       type="password" 
                       placeholder="••••••••" 
@@ -459,11 +481,11 @@ export function Approvals() {
                     />
                   </div>
 
-                  <div className="flex gap-3 pt-4">
+                  <div className="modal-footer" style={{ marginTop: '0.5rem' }}>
                     <GlassButton 
                       type="button" 
                       variant="ghost" 
-                      className="flex-1" 
+                      style={{ flex: 1 }} 
                       onClick={closeModal}
                       disabled={isSubmitting}
                     >
@@ -472,7 +494,8 @@ export function Approvals() {
                     <GlassButton 
                       type="submit" 
                       variant="primary" 
-                      className="flex-1"
+                      className="shadow-sm"
+                      style={{ flex: 1 }}
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? 'Saving...' : 'Set Password'}

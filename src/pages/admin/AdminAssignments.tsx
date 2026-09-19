@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Trash2, Edit, FileUp } from 'lucide-react';
+import { Plus, Trash2, Edit, FileUp, X } from 'lucide-react';
 import { GlassCard } from '../../components/ui/GlassCard';
 import { GlassButton } from '../../components/ui/GlassButton';
 import { GlassInput } from '../../components/ui/GlassInput';
@@ -135,7 +135,18 @@ export function AdminAssignments() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this assignment?')) return;
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to delete this assignment?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: 'var(--color-danger)',
+      cancelButtonColor: 'var(--color-primary)',
+      confirmButtonText: 'Yes, delete it!',
+      background: 'var(--color-glass-bg)',
+      color: 'var(--color-foreground)'
+    });
+    if (!result.isConfirmed) return;
     try {
       await assignmentService.deleteAssignment(id);
       fetchAssignments(selectedCourse);
@@ -183,86 +194,92 @@ export function AdminAssignments() {
   if (isLoading) return <div className="flex justify-center p-12"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="dashboard-container">
+      <div className="dashboard-header d-flex justify-between items-center flex-wrap gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Assignments</h2>
-          <p className="text-muted-foreground">Manage course assignments and grading</p>
+          <h2 className="dashboard-title text-2xl font-bold" style={{ color: 'var(--color-foreground)' }}>Assignments</h2>
+          <p className="font-medium mt-1" style={{ color: 'var(--color-muted-foreground)' }}>Manage course assignments and grading</p>
         </div>
         
-        <div className="w-full sm:w-auto flex flex-wrap gap-2 items-center">
+        <div className="d-flex flex-col gap-3" style={{ flex: '1 1 auto', alignItems: 'flex-end' }}>
+          <div className="d-flex items-center gap-2 flex-wrap justify-end">
+            <GlassButton className="admin-header-btn btn-export" style={{ flexShrink: 0 }} onClick={async () => {
+              if (!assignments.length) return Swal.fire('No assignments to export');
+              const { exportToExcel } = await import('../../utils/exportUtils');
+              exportToExcel(assignments, [
+                { header: 'Title', key: 'title' },
+                { header: 'Description', key: 'description' },
+                { header: 'Status', key: 'status' },
+                { header: 'Due Date', key: 'due_date' },
+                { header: 'Max Marks', key: 'max_marks' }
+              ], 'Assignments_Export');
+            }}>Excel</GlassButton>
+            <GlassButton className="shadow-sm admin-header-btn btn-export" style={{ flexShrink: 0 }} onClick={async () => {
+              if (!assignments.length) return Swal.fire('No assignments to export');
+              const { exportToPDF } = await import('../../utils/exportUtils');
+              exportToPDF(assignments, [
+                { header: 'Title', key: 'title' },
+                { header: 'Description', key: 'description' },
+                { header: 'Status', key: 'status' },
+                { header: 'Due Date', key: 'due_date' },
+                { header: 'Max Marks', key: 'max_marks' }
+              ], 'Assignments_Export', 'Assignments List');
+            }}>Pdf</GlassButton>
+            <GlassButton className="gap-2 shadow-sm admin-header-btn btn-export" style={{ flexShrink: 0 }} onClick={handleOpenCreateModal} disabled={!selectedCourse}>
+              <Plus style={{ height: '1.25rem', width: '1.25rem' }} /> Create
+            </GlassButton>
+          </div>
           <select 
-            className="w-full sm:w-64 h-10 px-4 rounded-xl border border-glass-highlight bg-glass/80 backdrop-blur-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+            className="form-input admin-header-select"
+            style={{ width: '100%', minWidth: '16rem', maxWidth: '24rem', paddingRight: '2.5rem' }}
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
           >
-            <option value="" disabled className="bg-background text-foreground">Select a course</option>
+            <option value="" disabled>Select a course</option>
             {courses.map(c => (
-              <option key={c.id} value={c.id} className="bg-background text-foreground">{c.title}</option>
+              <option key={c.id} value={c.id}>{c.title}</option>
             ))}
           </select>
-          <GlassButton variant="secondary" className="shrink-0" onClick={async () => {
-            if (!assignments.length) return Swal.fire('No assignments to export');
-            const { exportToExcel } = await import('../../utils/exportUtils');
-            exportToExcel(assignments, [
-              { header: 'Title', key: 'title' },
-              { header: 'Description', key: 'description' },
-              { header: 'Status', key: 'status' },
-              { header: 'Due Date', key: 'due_date' },
-              { header: 'Max Marks', key: 'max_marks' }
-            ], 'Assignments_Export');
-          }}>Export Excel</GlassButton>
-          <GlassButton variant="secondary" className="shrink-0" onClick={async () => {
-            if (!assignments.length) return Swal.fire('No assignments to export');
-            const { exportToPDF } = await import('../../utils/exportUtils');
-            exportToPDF(assignments, [
-              { header: 'Title', key: 'title' },
-              { header: 'Description', key: 'description' },
-              { header: 'Status', key: 'status' },
-              { header: 'Due Date', key: 'due_date' },
-              { header: 'Max Marks', key: 'max_marks' }
-            ], 'Assignments_Export', 'Assignments List');
-          }}>Export PDF</GlassButton>
-          <GlassButton variant="primary" className="gap-2 shrink-0" onClick={handleOpenCreateModal} disabled={!selectedCourse}>
-            <Plus className="h-4 w-4" /> Create Assignment
-          </GlassButton>
         </div>
       </div>
 
-      <GlassCard className="p-4 sm:p-6 min-h-[400px]">
+      <GlassCard className="p-6" style={{ minHeight: '400px' }}>
         {!selectedCourse ? (
-          <div className="h-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <p>Select a course to view assignments.</p>
+          <div className="empty-state">
+            <div className="empty-state-icon">
+              <Plus style={{ height: '3rem', width: '3rem', opacity: 0.5 }} />
+            </div>
+            <p className="empty-state-desc">Select a course to view assignments.</p>
           </div>
         ) : assignments.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <p>No assignments found. Click 'Create Assignment'.</p>
+          <div className="empty-state">
+            <p className="font-medium">No assignments found. Click 'Create Assignment'.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="d-flex flex-col gap-4">
             {assignments.map(assignment => (
-              <div key={assignment.id} className="flex items-center justify-between p-4 rounded-xl border border-glass-highlight bg-glass/30 hover:bg-glass/50 transition-colors">
+              <div key={assignment.id} className="d-flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-white/5 transition-all shadow-sm group" style={{ background: 'rgba(255,255,255,0.05)' }}>
                 <div>
-                  <h4 className="font-semibold text-foreground flex items-center gap-3">
+                  <h4 className="font-bold d-flex items-center gap-3">
                     {assignment.title}
                     {assignment.status === 'published' ? (
-                      <GlassBadge variant="success" className="text-[10px] px-2 py-0">Published</GlassBadge>
+                      <GlassBadge variant="success" style={{ fontSize: '10px', textTransform: 'uppercase' }}>Published</GlassBadge>
                     ) : (
-                      <GlassBadge variant="warning" className="text-[10px] px-2 py-0">Draft</GlassBadge>
+                      <GlassBadge variant="warning" style={{ fontSize: '10px', textTransform: 'uppercase' }}>Draft</GlassBadge>
                     )}
                   </h4>
-                  <p className="text-sm text-muted-foreground mt-1">Due: {assignment.due_date ? new Date(assignment.due_date).toLocaleString() : 'No due date'}</p>
+                  <p className="text-sm font-medium text-muted mt-2">Due: {assignment.due_date ? new Date(assignment.due_date).toLocaleString() : 'No due date'}</p>
                 </div>
-                <div className="flex gap-2">
-                  <GlassButton variant="secondary" size="sm" onClick={() => openGradingModal(assignment)}>Submissions</GlassButton>
-                  <GlassButton variant="ghost" size="sm" onClick={() => handleStatusToggle(assignment)}>
+                <div className="d-flex items-center gap-2" style={{ flexShrink: 0 }}>
+                  <GlassButton variant="secondary" size="sm" className="shadow-sm" onClick={() => openGradingModal(assignment)}>Submissions</GlassButton>
+                  <GlassButton variant="ghost" size="sm" className="shadow-sm font-medium" onClick={() => handleStatusToggle(assignment)}>
                     {assignment.status === 'published' ? 'Unpublish' : 'Publish'}
                   </GlassButton>
-                  <GlassButton variant="ghost" size="sm" className="h-8 w-8 p-0 text-primary" onClick={() => handleOpenEditModal(assignment)}>
-                    <Edit className="h-4 w-4" />
+                  <GlassButton variant="ghost" size="sm" className="btn-icon text-primary shadow-sm" onClick={() => handleOpenEditModal(assignment)}>
+                    <Edit style={{ height: '1.25rem', width: '1.25rem' }} />
                   </GlassButton>
-                  <GlassButton variant="ghost" size="sm" className="h-8 w-8 p-0 text-error hover:bg-error/10" onClick={() => handleDelete(assignment.id)}>
-                    <Trash2 className="h-4 w-4" />
+                  <GlassButton variant="ghost" size="sm" className="btn-icon text-danger shadow-sm" onClick={() => handleDelete(assignment.id)}>
+                    <Trash2 style={{ height: '1.25rem', width: '1.25rem' }} />
                   </GlassButton>
                 </div>
               </div>
@@ -273,59 +290,60 @@ export function AdminAssignments() {
 
       {/* Create/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <GlassCard className="w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold mb-6">{editingAssignment ? 'Edit Assignment' : 'Create Assignment'}</h3>
-            <form onSubmit={handleSave} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1.5 ml-1">Title</label>
+        <div className="modal-overlay">
+          <GlassCard className="modal-content">
+            <h3 className="modal-title">{editingAssignment ? 'Edit Assignment' : 'Create Assignment'}</h3>
+            <form onSubmit={handleSave} className="d-flex flex-col gap-6">
+              <div className="form-group">
+                <label className="form-label">Title</label>
                 <GlassInput required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="Assignment Title" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1.5 ml-1">Due Date</label>
+              <div className="dashboard-grid cols-2">
+                <div className="form-group">
+                  <label className="form-label">Due Date</label>
                   <input 
                     type="datetime-local" 
                     required
-                    className="w-full h-10 px-4 rounded-xl border border-glass-highlight bg-glass/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="form-input"
                     value={formData.due_date} 
                     onChange={e => setFormData({...formData, due_date: e.target.value})} 
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1.5 ml-1">Max Marks</label>
+                <div className="form-group">
+                  <label className="form-label">Max Marks</label>
                   <GlassInput type="number" min="0" required value={formData.max_marks} onChange={e => setFormData({...formData, max_marks: Number(e.target.value)})} />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1.5 ml-1">Link to Lecture (Optional)</label>
+              <div className="form-group">
+                <label className="form-label">Link to Lecture <span style={{ textTransform: 'lowercase', fontWeight: 500 }}>(Optional)</span></label>
                 <select 
-                  className="w-full h-10 px-4 rounded-xl border border-glass-highlight bg-glass/50 text-sm focus:outline-none appearance-none"
+                  className="form-input"
                   value={formData.lecture_id}
                   onChange={e => setFormData({...formData, lecture_id: e.target.value})}
                 >
-                  <option value="" className="bg-background text-foreground">None</option>
+                  <option value="" style={{ background: 'var(--color-background)', color: 'var(--color-foreground)' }}>None</option>
                   {lectures.map(l => (
-                    <option key={l.id} value={l.id} className="bg-background text-foreground">{l.title}</option>
+                    <option key={l.id} value={l.id} style={{ background: 'var(--color-background)', color: 'var(--color-foreground)' }}>{l.title}</option>
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1.5 ml-1">Description (Short)</label>
+              <div className="form-group">
+                <label className="form-label">Description (Short)</label>
                 <GlassInput value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Brief overview" />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1.5 ml-1">Detailed Instructions <span className="text-xs text-muted-foreground font-normal">(Optional)</span></label>
+              <div className="form-group">
+                <label className="form-label">Detailed Instructions <span style={{ textTransform: 'lowercase', fontWeight: 500 }}>(Optional)</span></label>
                 <textarea 
-                  className="w-full h-32 px-4 py-3 rounded-xl border border-glass-highlight bg-glass/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  className="form-input"
+                  style={{ height: '8rem', resize: 'none' }}
                   value={formData.instructions}
                   onChange={e => setFormData({...formData, instructions: e.target.value})}
                 />
               </div>
               
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="modal-footer">
                 <GlassButton type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</GlassButton>
-                <GlassButton type="submit" variant="primary">Save Assignment</GlassButton>
+                <GlassButton type="submit" variant="primary" className="shadow-sm">Save Assignment</GlassButton>
               </div>
             </form>
           </GlassCard>
@@ -334,16 +352,16 @@ export function AdminAssignments() {
 
       {/* Grading Modal */}
       {gradingModalOpen && selectedAssignmentForGrading && (
-        <div className="fixed inset-0 z-[60] bg-background/90 backdrop-blur-md flex items-center justify-center p-4">
-          <GlassCard className="w-full max-w-5xl p-0 h-[85vh] flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-glass-highlight bg-glass-highlight/30">
-              <div className="flex justify-between items-center mb-4">
+        <div className="modal-overlay" style={{ zIndex: 60 }}>
+          <GlassCard className="modal-content" style={{ maxWidth: '64rem', padding: 0, height: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div className="p-6 border-b border-white/10" style={{ background: 'rgba(255,255,255,0.05)', position: 'relative' }}>
+              <div className="d-flex flex-wrap justify-between items-start gap-4 mb-4" style={{ paddingRight: '2.5rem' }}>
                 <div>
-                  <h3 className="text-xl font-bold">Submissions</h3>
-                  <p className="text-sm text-muted-foreground">{selectedAssignmentForGrading.title} (Max: {selectedAssignmentForGrading.max_marks})</p>
+                  <h3 className="font-bold text-xl">Submissions</h3>
+                  <p className="text-sm font-medium text-muted">{selectedAssignmentForGrading.title} (Max: {selectedAssignmentForGrading.max_marks})</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <GlassButton variant="secondary" size="sm" onClick={async () => {
+                <div className="d-flex flex-wrap gap-2 items-center">
+                  <GlassButton variant="secondary" size="sm" className="shadow-sm btn-export" onClick={async () => {
                     if (!submissions.length) return Swal.fire('No submissions to export');
                     const { exportToExcel } = await import('../../utils/exportUtils');
                     const formatted = submissions.map(s => ({
@@ -364,8 +382,8 @@ export function AdminAssignments() {
                       { header: 'Live URL', key: 'live' },
                       { header: 'File URL', key: 'file' }
                     ], `Submissions_${selectedAssignmentForGrading.title.replace(/\s+/g, '_')}`);
-                  }}>Export Excel</GlassButton>
-                  <GlassButton variant="secondary" size="sm" onClick={async () => {
+                  }}>Excel</GlassButton>
+                  <GlassButton variant="secondary" size="sm" className="shadow-sm btn-export" onClick={async () => {
                     if (!submissions.length) return Swal.fire('No submissions to export');
                     const { exportToPDF } = await import('../../utils/exportUtils');
                     const formatted = submissions.map(s => ({
@@ -382,14 +400,24 @@ export function AdminAssignments() {
                       { header: 'Marks', key: 'marks' },
                       { header: 'Attachments', key: 'links' }
                     ], `Submissions_${selectedAssignmentForGrading.title.replace(/\s+/g, '_')}`, `Submissions for ${selectedAssignmentForGrading.title}`);
-                  }}>Export PDF</GlassButton>
-                  <GlassButton variant="ghost" size="sm" onClick={() => setGradingModalOpen(false)}>Close</GlassButton>
+                  }}>Pdf</GlassButton>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <GlassButton 
+                variant="ghost" 
+                size="sm" 
+                className="btn-icon text-muted-foreground" 
+                onClick={() => setGradingModalOpen(false)} 
+                title="Close"
+                style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', zIndex: 10 }}
+              >
+                <X style={{ width: '1.25rem', height: '1.25rem' }} />
+              </GlassButton>
+              <div className="d-flex gap-2">
                 <GlassButton 
                   variant={activeTab === 'all' ? 'primary' : 'ghost'} 
                   size="sm" 
+                  className={activeTab === 'all' ? 'shadow-sm' : ''}
                   onClick={() => setActiveTab('all')}
                 >
                   All Submissions
@@ -397,6 +425,7 @@ export function AdminAssignments() {
                 <GlassButton 
                   variant={activeTab === 'links' ? 'primary' : 'ghost'} 
                   size="sm" 
+                  className={activeTab === 'links' ? 'shadow-sm' : ''}
                   onClick={() => setActiveTab('links')}
                 >
                   Links
@@ -404,6 +433,7 @@ export function AdminAssignments() {
                 <GlassButton 
                   variant={activeTab === 'files' ? 'primary' : 'ghost'} 
                   size="sm" 
+                  className={activeTab === 'files' ? 'shadow-sm' : ''}
                   onClick={() => setActiveTab('files')}
                 >
                   Files
@@ -411,22 +441,25 @@ export function AdminAssignments() {
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6">
+            <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-6)' }}>
               {submissions.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  <p>No submissions yet.</p>
+                <div className="empty-state" style={{ height: '100%', border: 'none', background: 'transparent' }}>
+                  <div className="empty-state-icon">
+                    <FileUp style={{ height: '2.5rem', width: '2.5rem', opacity: 0.5 }} />
+                  </div>
+                  <p className="empty-state-desc">No submissions yet.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="table-container">
                   {activeTab === 'all' && (
-                    <table className="w-full text-left border-collapse">
+                    <table className="table">
                       <thead>
-                        <tr className="border-b border-glass-highlight text-sm text-muted-foreground">
-                          <th className="p-3 font-medium">Name</th>
-                          <th className="p-3 font-medium">Roll Number</th>
-                          <th className="p-3 font-medium">Via</th>
-                          <th className="p-3 font-medium">Status</th>
-                          <th className="p-3 font-medium">Action</th>
+                        <tr>
+                          <th>Name</th>
+                          <th>Roll Number</th>
+                          <th>Via</th>
+                          <th>Status</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -443,27 +476,27 @@ export function AdminAssignments() {
                   )}
 
                   {activeTab === 'links' && (
-                    <table className="w-full text-left border-collapse">
+                    <table className="table">
                       <thead>
-                        <tr className="border-b border-glass-highlight text-sm text-muted-foreground">
-                          <th className="p-3 font-medium">Name</th>
-                          <th className="p-3 font-medium">Roll Number</th>
-                          <th className="p-3 font-medium">Git Repo</th>
-                          <th className="p-3 font-medium">Live URL</th>
+                        <tr>
+                          <th>Name</th>
+                          <th>Roll Number</th>
+                          <th>Git Repo</th>
+                          <th>Live URL</th>
                         </tr>
                       </thead>
                       <tbody>
                         {submissions.filter(s => s.github_url || s.live_url).length === 0 ? (
-                          <tr><td colSpan={4} className="p-4 text-center text-muted-foreground">No link submissions</td></tr>
+                          <tr><td colSpan={4} className="text-center text-muted py-6">No link submissions</td></tr>
                         ) : submissions.filter(s => s.github_url || s.live_url).map(sub => (
-                          <tr key={sub.id} className="border-b border-glass-highlight/50 hover:bg-glass/20">
-                            <td className="p-3 font-medium">{sub.profiles?.full_name}</td>
-                            <td className="p-3 text-muted-foreground">{sub.profiles?.roll_number || '-'}</td>
-                            <td className="p-3">
-                              {sub.github_url ? <a href={sub.github_url} target="_blank" rel="noreferrer" className="text-primary hover:underline truncate block max-w-[200px]">{sub.github_url}</a> : <span className="text-muted-foreground text-sm">No preview</span>}
+                          <tr key={sub.id}>
+                            <td className="font-bold">{sub.profiles?.full_name}</td>
+                            <td className="text-muted">{sub.profiles?.roll_number || '-'}</td>
+                            <td>
+                              {sub.github_url ? <a href={sub.github_url} target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'block', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub.github_url}</a> : <span className="text-muted text-sm opacity-60">No preview</span>}
                             </td>
-                            <td className="p-3">
-                              {sub.live_url ? <a href={sub.live_url} target="_blank" rel="noreferrer" className="text-primary hover:underline truncate block max-w-[200px]">{sub.live_url}</a> : <span className="text-muted-foreground text-sm">No preview</span>}
+                            <td>
+                              {sub.live_url ? <a href={sub.live_url} target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'block', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub.live_url}</a> : <span className="text-muted text-sm opacity-60">No preview</span>}
                             </td>
                           </tr>
                         ))}
@@ -472,25 +505,25 @@ export function AdminAssignments() {
                   )}
 
                   {activeTab === 'files' && (
-                    <table className="w-full text-left border-collapse">
+                    <table className="table">
                       <thead>
-                        <tr className="border-b border-glass-highlight text-sm text-muted-foreground">
-                          <th className="p-3 font-medium">Name</th>
-                          <th className="p-3 font-medium">Roll Number</th>
-                          <th className="p-3 font-medium">File</th>
+                        <tr>
+                          <th>Name</th>
+                          <th>Roll Number</th>
+                          <th>File</th>
                         </tr>
                       </thead>
                       <tbody>
                         {submissions.filter(s => s.file_url).length === 0 ? (
-                          <tr><td colSpan={3} className="p-4 text-center text-muted-foreground">No file submissions</td></tr>
+                          <tr><td colSpan={3} className="text-center text-muted py-6">No file submissions</td></tr>
                         ) : submissions.filter(s => s.file_url).map(sub => (
-                          <tr key={sub.id} className="border-b border-glass-highlight/50 hover:bg-glass/20">
-                            <td className="p-3 font-medium">{sub.profiles?.full_name}</td>
-                            <td className="p-3 text-muted-foreground">{sub.profiles?.roll_number || '-'}</td>
-                            <td className="p-3">
-                              <a href={sub.file_url!} target="_blank" rel="noreferrer">
-                                <GlassButton variant="secondary" size="sm" className="gap-2">
-                                  <FileUp className="h-4 w-4" /> View File
+                          <tr key={sub.id}>
+                            <td className="font-bold">{sub.profiles?.full_name}</td>
+                            <td className="text-muted">{sub.profiles?.roll_number || '-'}</td>
+                            <td>
+                              <a href={sub.file_url!} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                                <GlassButton variant="secondary" size="sm" className="gap-2 shadow-sm">
+                                  <FileUp style={{ height: '1rem', width: '1rem' }} /> View File
                                 </GlassButton>
                               </a>
                             </td>
@@ -511,7 +544,7 @@ export function AdminAssignments() {
 
 function SubmissionRowAll({ sub, maxMarks, onSave }: { sub: any, maxMarks: number, onSave: (m: number, f: string) => void }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [marks, setMarks] = useState(sub.marks || 0);
+  const [marks, setMarks] = useState<string>(sub.marks !== undefined && sub.marks !== null ? sub.marks.toString() : '');
   const [feedback, setFeedback] = useState(sub.feedback || '');
 
   const via: string[] = [];
@@ -520,52 +553,72 @@ function SubmissionRowAll({ sub, maxMarks, onSave }: { sub: any, maxMarks: numbe
   const viaDisplay = via.length > 0 ? via.join(' + ') : 'TEXT ONLY';
 
   const handleSave = () => {
-    if (marks > maxMarks || marks < 0) return Swal.fire(`Marks must be between 0 and ${maxMarks}`);
-    onSave(marks, feedback);
+    const numMarks = marks === '' ? 0 : Number(marks);
+    if (numMarks > maxMarks || numMarks < 0) return Swal.fire(`Marks must be between 0 and ${maxMarks}`);
+    onSave(numMarks, feedback);
     setIsExpanded(false);
   };
 
   return (
     <>
-      <tr className="border-b border-glass-highlight/50 hover:bg-glass/20 transition-colors">
-        <td className="p-3 font-medium">{sub.profiles?.full_name}</td>
-        <td className="p-3 text-muted-foreground">{sub.profiles?.roll_number || '-'}</td>
-        <td className="p-3">
-          <GlassBadge variant="default" className="text-[10px] uppercase">{viaDisplay}</GlassBadge>
+      <tr>
+        <td className="font-bold">{sub.profiles?.full_name}</td>
+        <td className="text-muted">{sub.profiles?.roll_number || '-'}</td>
+        <td>
+          <GlassBadge variant="default" style={{ fontSize: '10px', textTransform: 'uppercase' }}>{viaDisplay}</GlassBadge>
         </td>
-        <td className="p-3">
+        <td>
           {sub.status === 'graded' ? (
-            <span className="text-success text-sm font-medium">{sub.marks}/{maxMarks}</span>
+            <span className="text-success text-sm font-bold">{sub.marks}/{maxMarks}</span>
           ) : (
-            <span className="text-warning text-sm">Needs Grading</span>
+            <span className="text-warning text-sm font-bold opacity-80">Needs Grading</span>
           )}
         </td>
-        <td className="p-3">
-          <GlassButton variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
+        <td>
+          <GlassButton variant={isExpanded ? 'primary' : 'ghost'} size="sm" onClick={() => setIsExpanded(!isExpanded)} className={isExpanded ? 'shadow-sm' : ''}>
             {isExpanded ? 'Close' : 'Grade'}
           </GlassButton>
         </td>
       </tr>
       {isExpanded && (
-        <tr className="bg-glass/10 border-b border-glass-highlight">
-          <td colSpan={5} className="p-4">
-            <div className="flex flex-col gap-4 max-w-2xl">
+        <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <td colSpan={5} style={{ padding: '1.5rem' }}>
+            <div className="d-flex flex-col gap-5" style={{ maxWidth: '48rem' }}>
+              {(sub.file_url || sub.github_url || sub.live_url) && (
+                <div className="d-flex flex-wrap gap-3">
+                  {sub.file_url && (
+                    <a href={sub.file_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary shadow-sm btn-sm">
+                      View File
+                    </a>
+                  )}
+                  {sub.github_url && (
+                    <a href={sub.github_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary shadow-sm btn-sm">
+                      GitHub Repo
+                    </a>
+                  )}
+                  {sub.live_url && (
+                    <a href={sub.live_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary shadow-sm btn-sm">
+                      Live URL
+                    </a>
+                  )}
+                </div>
+              )}
               {sub.submission_text && (
-                <div className="bg-background/50 p-3 rounded-lg border border-glass-highlight text-sm">
-                  <span className="font-semibold text-muted-foreground block mb-1">Comments:</span>
+                <div className="p-4 rounded-xl border border-white/5 text-sm font-medium" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <span className="font-bold text-muted block mb-2" style={{ textTransform: 'uppercase', fontSize: '10px' }}>Comments:</span>
                   {sub.submission_text}
                 </div>
               )}
-              <div className="flex gap-4 items-end bg-background/50 p-4 rounded-xl border border-glass-highlight/50">
-                <div>
-                  <label className="block text-xs mb-1">Marks (/{maxMarks})</label>
-                  <GlassInput type="number" min="0" max={maxMarks} value={marks} onChange={e => setMarks(Number(e.target.value))} className="w-24" />
+              <div className="d-flex flex-col sm:flex-row gap-5 items-end p-5 rounded-xl border border-white/5" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label">Marks (/{maxMarks})</label>
+                  <GlassInput type="number" min="0" max={maxMarks} value={marks} onChange={e => setMarks(e.target.value)} style={{ width: '8rem' }} />
                 </div>
-                <div className="flex-1">
-                  <label className="block text-xs mb-1">Feedback</label>
+                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                  <label className="form-label">Feedback</label>
                   <GlassInput value={feedback} onChange={e => setFeedback(e.target.value)} placeholder="Good job..." />
                 </div>
-                <GlassButton variant="primary" onClick={handleSave}>Save Grade</GlassButton>
+                <GlassButton variant="primary" onClick={handleSave} className="shadow-sm" style={{ width: '100%', maxWidth: 'max-content' }}>Save Grade</GlassButton>
               </div>
             </div>
           </td>

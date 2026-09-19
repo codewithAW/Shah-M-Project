@@ -61,15 +61,19 @@ export function Notifications() {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center p-20"><div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div></div>;
+    return (
+      <div className="d-flex justify-center items-center p-20">
+        <div className="animate-spin rounded-full" style={{ height: '2.5rem', width: '2.5rem', border: '4px solid var(--color-primary)', borderTopColor: 'transparent' }}></div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="d-flex flex-col gap-8" style={{ maxWidth: '56rem', margin: '0 auto' }}>
+      <div className="d-flex flex-wrap justify-between items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Notifications</h2>
-          <p className="text-muted-foreground">Stay updated with your courses and assignments</p>
+          <h2 className="dashboard-title text-2xl font-bold tracking-tight">Notifications</h2>
+          <p className="text-muted">Stay updated with your courses and assignments</p>
         </div>
         
         {notifications.some(n => !n.is_read) && (
@@ -79,63 +83,66 @@ export function Notifications() {
         )}
       </div>
 
-      <GlassCard className="p-0 overflow-hidden">
+      <GlassCard className="p-0 overflow-hidden shadow-sm" style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
         {notifications.length === 0 ? (
-          <div className="p-16 text-center text-muted-foreground">
-            <div className="h-20 w-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
-              <Bell className="h-10 w-10" />
+          <div className="p-16 text-center text-muted">
+            <div className="stat-icon text-primary mx-auto mb-6 shadow-sm" style={{ width: '6rem', height: '6rem', borderRadius: '1.5rem', background: 'linear-gradient(to bottom right, rgba(var(--color-primary-rgb), 0.2), rgba(var(--color-primary-rgb), 0.05))', border: '1px solid rgba(var(--color-primary-rgb), 0.1)' }}>
+              <Bell style={{ height: '3rem', width: '3rem' }} />
             </div>
-            <h3 className="text-xl font-bold mb-2">You're all caught up!</h3>
-            <p>You have no notifications right now.</p>
+            <h3 className="text-xl font-bold mb-2 tracking-tight">You're all caught up!</h3>
+            <p className="font-medium">You have no notifications right now.</p>
           </div>
         ) : (
-          <div className="divide-y divide-glass-highlight">
-            {notifications.map(notif => (
+          <div className="d-flex flex-col">
+            {notifications.map((notif, index) => (
               <div 
                 key={notif.id} 
-                className={`p-6 transition-colors hover:bg-glass/30 flex flex-col sm:flex-row justify-between gap-4 ${!notif.is_read ? 'bg-primary/5' : ''}`}
+                className="p-6 transition-all d-flex flex-wrap justify-between gap-5 hover-float"
+                style={!notif.is_read ? { background: 'rgba(var(--color-primary-rgb), 0.05)', borderTop: index > 0 ? '1px solid rgba(255,255,255,0.05)' : 'none' } : { borderTop: index > 0 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
               >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-lg font-semibold text-foreground">{notif.title}</h4>
+                <div style={{ flex: '1 1 0%' }}>
+                  <div className="d-flex items-center gap-3 mb-2">
+                    <h4 className="text-lg font-bold tracking-tight">{notif.title}</h4>
                     {!notif.is_read && (
-                      <span className="h-2 w-2 rounded-full bg-primary inline-block"></span>
+                      <span className="rounded-full bg-primary" style={{ height: '0.625rem', width: '0.625rem', boxShadow: '0 0 8px rgba(var(--color-primary-rgb), 0.6)', display: 'inline-block' }}></span>
                     )}
                   </div>
-                  <p className="text-muted-foreground">{notif.message}</p>
+                  <p className="text-muted font-medium leading-relaxed">{notif.message}</p>
                   
-                  <div className="flex items-center gap-4 mt-3">
-                    <span className="text-xs text-muted-foreground font-medium bg-background/50 px-2 py-1 rounded-md">
+                  <div className="d-flex items-center gap-4 mt-4">
+                    <span className="text-xs text-muted font-bold tracking-widest uppercase rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', padding: '0.375rem 0.75rem', border: '1px solid rgba(255,255,255,0.05)' }}>
                       {new Date(notif.created_at).toLocaleDateString()} at {new Date(notif.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                     </span>
                     {notif.link && (
-                      <Link to={notif.link} className="text-sm font-medium text-primary hover:underline">
+                      <Link to={notif.link} className="text-sm font-bold text-primary" style={{ textDecoration: 'none' }}>
                         View Details
                       </Link>
                     )}
                   </div>
                 </div>
                 
-                <div className="flex sm:flex-col items-center justify-end gap-2 shrink-0">
+                <div className="d-flex items-center justify-end gap-3" style={{ flexShrink: 0 }}>
                   {!notif.is_read && (
                     <GlassButton 
                       variant="ghost" 
                       size="sm" 
-                      className="text-success h-9 w-9 p-0 rounded-full"
+                      className="text-success p-0 rounded-full shadow-sm"
+                      style={{ height: '2.5rem', width: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid transparent' }}
                       onClick={() => handleMarkAsRead(notif.id)}
                       title="Mark as read"
                     >
-                      <Check className="h-4 w-4" />
+                      <Check style={{ height: '1.25rem', width: '1.25rem' }} />
                     </GlassButton>
                   )}
                   <GlassButton 
                     variant="ghost" 
                     size="sm" 
-                    className="text-error h-9 w-9 p-0 rounded-full hover:bg-error/10"
+                    className="text-danger p-0 rounded-full shadow-sm"
+                    style={{ height: '2.5rem', width: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid transparent' }}
                     onClick={() => handleDelete(notif.id)}
                     title="Delete"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 style={{ height: '1.25rem', width: '1.25rem' }} />
                   </GlassButton>
                 </div>
               </div>

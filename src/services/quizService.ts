@@ -70,7 +70,7 @@ export const quizService = {
           type: 'QUIZ_PUBLISHED',
           title: 'New Quiz',
           message: `A new quiz "${data.title}" has been published.`,
-          link: `/quizzes/${data.id}`,
+          link: `/quiz/${data.id}`,
           course_id: data.course_id,
           created_by: user.id
         }));

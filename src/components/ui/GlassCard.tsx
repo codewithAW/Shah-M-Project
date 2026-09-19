@@ -10,12 +10,11 @@ export function GlassCard({ children, className, variant = 'default', ...props }
   return (
     <div
       className={cn(
-        'rounded-2xl p-6',
+        'glass-card glass-card-body',
         {
-          'glass-panel': variant === 'default' || variant === 'interactive',
-          'glass-elevated': variant === 'elevated',
+          'is-elevated': variant === 'elevated',
+          'is-interactive': variant === 'interactive',
         },
-        variant === 'interactive' && 'hover:shadow-glass-lg hover:border-primary/20 transition-all duration-200 cursor-pointer',
         className
       )}
       {...props}

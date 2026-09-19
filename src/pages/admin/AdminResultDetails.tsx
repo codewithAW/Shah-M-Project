@@ -65,18 +65,18 @@ export function AdminResultDetails() {
 
   if (isLoading) {
     return (
-      <div className="h-full flex items-center justify-center p-6">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      <div className="d-flex items-center justify-center h-full p-6">
+        <div className="animate-spin h-8 w-8 rounded-full" style={{ border: '4px solid var(--color-primary)', borderTopColor: 'transparent' }}></div>
       </div>
     );
   }
 
   if (!student) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-6 text-muted-foreground">
-        <p>Student not found.</p>
-        <Link to="/teacher/results" className="mt-4 text-primary hover:underline flex items-center gap-2">
-          <ArrowLeft className="h-4 w-4" /> Back to Results
+      <div className="empty-state">
+        <p className="empty-state-desc">Student not found.</p>
+        <Link to="/teacher/results" className="d-flex items-center gap-2 mt-4" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 500 }}>
+          <ArrowLeft style={{ height: '1rem', width: '1rem' }} /> Back to Results
         </Link>
       </div>
     );
@@ -100,72 +100,75 @@ export function AdminResultDetails() {
   const grandTotal = totalQuizMarks + totalAssignmentMarks;
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <Link to="/teacher/results" className="p-2 rounded-xl bg-glass hover:bg-glass/80 transition-colors text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{student.full_name}</h1>
-          <p className="text-muted-foreground mt-1">Roll: {student.roll_number} | Username: {student.username}</p>
+    <div className="dashboard-container">
+      <div className="dashboard-header" style={{ alignItems: 'center' }}>
+        <div className="d-flex items-center gap-5">
+          <Link to="/teacher/results" className="btn-icon shadow-sm group" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-muted)' }}>
+            <ArrowLeft style={{ height: '1.5rem', width: '1.5rem' }} className="group-hover:-translate-x-1 transition-transform" />
+          </Link>
+          <div>
+            <h1 className="dashboard-title">{student.full_name}</h1>
+            <p className="text-sm font-medium text-muted mt-1">Roll: {student.roll_number} | Username: {student.username}</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <GlassCard className="p-6 flex items-center gap-4 border-primary/20 bg-primary/5">
-          <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-            <CheckSquare className="h-6 w-6" />
+      <div className="dashboard-grid cols-3">
+        <GlassCard className="d-flex items-center gap-5 shadow-sm" style={{ padding: '1.5rem' }}>
+          <div className="stat-icon text-primary">
+            <CheckSquare style={{ height: '1.75rem', width: '1.75rem' }} />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Total Quiz Marks</p>
-            <p className="text-2xl font-bold">{totalQuizMarks}</p>
+            <p className="stat-label">Total Quiz Marks</p>
+            <p className="stat-value">{totalQuizMarks}</p>
           </div>
         </GlassCard>
         
-        <GlassCard className="p-6 flex items-center gap-4 border-accent/20 bg-accent/5">
-          <div className="h-12 w-12 rounded-full bg-accent/20 flex items-center justify-center text-accent">
-            <BookOpen className="h-6 w-6" />
+        <GlassCard className="d-flex items-center gap-5 shadow-sm" style={{ padding: '1.5rem' }}>
+          <div className="stat-icon" style={{ color: '#06b6d4', background: 'rgba(6, 182, 212, 0.1)' }}>
+            <BookOpen style={{ height: '1.75rem', width: '1.75rem' }} />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Total Assignment Marks</p>
-            <p className="text-2xl font-bold">{totalAssignmentMarks}</p>
+            <p className="stat-label">Total Assignment Marks</p>
+            <p className="stat-value">{totalAssignmentMarks}</p>
           </div>
         </GlassCard>
 
-        <GlassCard className="p-6 flex items-center gap-4 border-success/20 bg-success/5">
-          <div className="h-12 w-12 rounded-full bg-success/20 flex items-center justify-center text-success">
-            <Award className="h-6 w-6" />
+        <GlassCard className="d-flex items-center gap-5 shadow-sm" style={{ padding: '1.5rem' }}>
+          <div className="stat-icon text-success" style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
+            <Award style={{ height: '1.75rem', width: '1.75rem' }} />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Grand Total</p>
-            <p className="text-2xl font-bold">{grandTotal}</p>
+            <p className="stat-label">Grand Total</p>
+            <p className="stat-value">{grandTotal}</p>
           </div>
         </GlassCard>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
+      <div className="dashboard-grid cols-2" style={{ flex: 1, minHeight: 0 }}>
         {/* Quizzes Section */}
-        <GlassCard className="p-6 flex flex-col min-h-0">
-          <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-            <CheckSquare className="h-5 w-5 text-primary" /> Quiz Attempts
+        <GlassCard className="d-flex flex-col p-6 shadow-sm" style={{ minHeight: 0 }}>
+          <h2 className="font-bold text-lg d-flex items-center gap-3 mb-6">
+            <div className="stat-icon text-primary" style={{ width: '2.5rem', height: '2.5rem', borderRadius: '0.75rem' }}><CheckSquare style={{ height: '1.25rem', width: '1.25rem' }} /></div>
+            Quiz Attempts
           </h2>
-          <div className="overflow-y-auto flex-1 pr-2 space-y-3">
+          <div className="d-flex flex-col gap-4" style={{ overflowY: 'auto', flex: 1, paddingRight: '0.5rem' }}>
             {quizAttempts.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">No quiz attempts yet.</p>
+              <p className="text-sm font-medium text-muted text-center py-8">No quiz attempts yet.</p>
             ) : (
               quizAttempts.map((attempt) => {
                 const isCheated = attempt.status === 'cheating_detected';
                 return (
-                  <div key={attempt.id} className={`p-4 rounded-xl border ${isCheated ? 'bg-error/10 border-error/50' : 'bg-background/50 border-glass-highlight'}`}>
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className={`font-medium text-sm ${isCheated ? 'text-error' : ''}`}>{attempt.quizzes?.title || 'Unknown Quiz'}</h3>
+                  <div key={attempt.id} className="p-4 rounded-xl border border-white/5 transition-all hover-bg-white-10" style={{ background: isCheated ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255,255,255,0.05)', borderColor: isCheated ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.1)' }}>
+                    <div className="d-flex justify-between items-start mb-2">
+                      <h3 className="font-bold" style={{ color: isCheated ? 'var(--color-danger)' : 'var(--color-foreground)' }}>{attempt.quizzes?.title || 'Unknown Quiz'}</h3>
                       {isCheated ? (
-                        <span className="text-sm font-bold text-error">Cheating Detected</span>
+                        <span className="badge badge-danger">Cheating Detected</span>
                       ) : (
-                        <span className="text-sm font-bold text-primary">{attempt.score} marks</span>
+                        <span className="font-bold text-primary text-sm">{attempt.score} marks</span>
                       )}
                     </div>
-                    <div className={`flex justify-between items-center text-xs ${isCheated ? 'text-error/70' : 'text-muted-foreground'}`}>
+                    <div className="d-flex justify-between items-center text-xs font-medium" style={{ color: isCheated ? 'var(--color-danger)' : 'var(--color-muted)' }}>
                       <span>Attempt {attempt.attempt_number}</span>
                       <span>{new Date(attempt.created_at).toLocaleDateString()}</span>
                     </div>
@@ -177,28 +180,30 @@ export function AdminResultDetails() {
         </GlassCard>
 
         {/* Assignments Section */}
-        <GlassCard className="p-6 flex flex-col min-h-0">
-          <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-accent" /> Assignment Submissions
+        <GlassCard className="d-flex flex-col p-6 shadow-sm" style={{ minHeight: 0 }}>
+          <h2 className="font-bold text-lg d-flex items-center gap-3 mb-6">
+            <div className="stat-icon" style={{ width: '2.5rem', height: '2.5rem', borderRadius: '0.75rem', color: '#06b6d4', background: 'rgba(6, 182, 212, 0.1)' }}><BookOpen style={{ height: '1.25rem', width: '1.25rem' }} /></div>
+            Assignment Submissions
           </h2>
-          <div className="overflow-y-auto flex-1 pr-2 space-y-3">
+          <div className="d-flex flex-col gap-4" style={{ overflowY: 'auto', flex: 1, paddingRight: '0.5rem' }}>
             {assignmentSubmissions.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">No graded assignments yet.</p>
+              <p className="text-sm font-medium text-muted text-center py-8">No graded assignments yet.</p>
             ) : (
               assignmentSubmissions.map((sub) => (
-                <div key={sub.id} className="p-4 rounded-xl bg-background/50 border border-glass-highlight">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-medium text-sm">{sub.assignments?.title || 'Unknown Assignment'}</h3>
-                    <span className="text-sm font-bold text-accent">{sub.marks} / {sub.assignments?.max_marks} marks</span>
+                <div key={sub.id} className="p-4 rounded-xl border border-white/5 transition-all hover-bg-white-10" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <div className="d-flex justify-between items-start mb-2">
+                    <h3 className="font-bold">{sub.assignments?.title || 'Unknown Assignment'}</h3>
+                    <span className="font-bold text-sm" style={{ color: '#06b6d4' }}>{sub.marks} / {sub.assignments?.max_marks} marks</span>
                   </div>
-                  <div className="flex justify-between items-center text-xs text-muted-foreground">
-                    <span className="capitalize text-success">Graded</span>
+                  <div className="d-flex justify-between items-center text-xs font-medium text-muted">
+                    <span className="badge badge-success">Graded</span>
                     <span>{new Date(sub.submitted_at).toLocaleDateString()}</span>
                   </div>
                   {sub.feedback && (
-                    <p className="mt-2 text-xs text-muted-foreground bg-glass/30 p-2 rounded">
-                      Feedback: {sub.feedback}
-                    </p>
+                    <div className="mt-3 text-sm font-medium p-3 rounded-lg border border-white/5" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                      <span className="text-xs font-bold text-muted block mb-1" style={{ textTransform: 'uppercase' }}>Feedback</span>
+                      {sub.feedback}
+                    </div>
                   )}
                 </div>
               ))

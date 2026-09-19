@@ -61,8 +61,8 @@ export function StudentQuizzes() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+      <div className="d-flex justify-center items-center" style={{ minHeight: '50vh' }}>
+        <div className="animate-spin h-8 w-8 rounded-full" style={{ border: '2px solid var(--color-primary)', borderTopColor: 'transparent' }} />
       </div>
     );
   }
@@ -78,70 +78,71 @@ export function StudentQuizzes() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="d-flex flex-col gap-8">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold">My Quizzes</h1>
-        <p className="text-sm text-muted-foreground mt-1">View and take quizzes across all your courses.</p>
+      <div className="text-center">
+        <h1 className="dashboard-title text-2xl font-bold">My Quizzes</h1>
+        <p className="text-sm text-muted mt-1">View and take quizzes across all your courses.</p>
       </div>
 
       {quizzes.length === 0 ? (
         <GlassCard className="p-10 text-center">
-          <HelpCircle className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30" />
+          <HelpCircle className="mx-auto mb-3 text-muted" style={{ height: '2.5rem', width: '2.5rem', opacity: 0.3 }} />
           <h3 className="font-semibold mb-1">No quizzes available</h3>
-          <p className="text-sm text-muted-foreground max-w-sm mx-auto">There are no quizzes assigned to you at the moment.</p>
+          <p className="text-sm text-muted max-w-sm mx-auto">There are no quizzes assigned to you at the moment.</p>
         </GlassCard>
       ) : (
-        <div className="space-y-10">
+        <div className="d-flex flex-col gap-10">
           {Object.entries(groupedQuizzes).map(([courseTitle, courseQuizzes]) => (
-            <div key={courseTitle} className="space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b border-border">
-                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <HelpCircle className="h-4 w-4" />
+            <div key={courseTitle} className="d-flex flex-col gap-6">
+              <div className="d-flex items-center gap-4 pb-4 border-b border-white/5">
+                <div className="stat-icon text-primary shadow-sm" style={{ width: '3rem', height: '3rem', borderRadius: '1rem', border: '1px solid rgba(var(--color-primary-rgb), 0.1)' }}>
+                  <HelpCircle style={{ height: '1.5rem', width: '1.5rem' }} />
                 </div>
-                <h2 className="text-lg font-semibold">{courseTitle}</h2>
-                <GlassBadge>{courseQuizzes.length} items</GlassBadge>
+                <h2 className="text-xl font-bold tracking-tight">{courseTitle}</h2>
+                <GlassBadge className="shadow-sm" style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>{courseQuizzes.length} items</GlassBadge>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="dashboard-grid cols-3">
                 {courseQuizzes.map((quiz) => {
                   const attemptInfo = attemptMap[quiz.id];
                   const status = attemptInfo?.status || 'not_started';
                   const passed = attemptInfo?.passed;
                   
                   return (
-                    <GlassCard key={quiz.id} className="p-5 flex flex-col">
-                      <div className="mb-4">
-                        <div className="flex justify-between items-start gap-3 mb-3">
-                          <h3 className="font-semibold text-sm leading-snug line-clamp-2" title={quiz.title}>
+                    <GlassCard key={quiz.id} className="d-flex flex-col p-6 hover-float transition-all">
+                      <div className="mb-5">
+                        <div className="d-flex justify-between items-start gap-4 mb-4">
+                          <h3 className="font-semibold text-base leading-snug tracking-tight" title={quiz.title} style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             {quiz.title}
                           </h3>
                           <GlassBadge 
-                            variant={status === 'cheating_detected' || status === 'abandoned' ? 'error' : (['graded', 'submitted', 'auto_submitted'].includes(status) ? 'success' : status === 'not_started' ? 'primary' : 'warning')}
-                            className="text-[10px] uppercase shrink-0"
+                            variant={status === 'cheating_detected' || status === 'abandoned' ? 'danger' : (['graded', 'submitted', 'auto_submitted'].includes(status) ? 'success' : status === 'not_started' ? 'primary' : 'warning')}
+                            className="text-xs uppercase font-bold shadow-sm"
+                            style={{ flexShrink: 0, alignSelf: 'flex-start' }}
                           >
                             {status === 'cheating_detected' || status === 'abandoned' ? 'Cheating' : (status === 'graded' ? (passed ? 'Passed' : 'Failed') : status.replace('_', ' '))}
                           </GlassBadge>
                         </div>
                         
-                        <div className="space-y-2 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-2">
-                            <Clock className="h-3.5 w-3.5 shrink-0" />
+                        <div className="d-flex flex-col gap-2 text-xs text-muted font-medium">
+                          <div className="d-flex items-center gap-2">
+                            <Clock style={{ height: '1rem', width: '1rem', opacity: 0.7 }} />
                             <span>{quiz.duration_minutes ? `${quiz.duration_minutes} Minutes` : 'No Time Limit'}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="h-3.5 w-3.5 shrink-0" />
+                          <div className="d-flex items-center gap-2">
+                            <CheckCircle style={{ height: '1rem', width: '1rem', opacity: 0.7 }} />
                             <span>Passing: {quiz.passing_percentage}%</span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="mt-auto pt-4 border-t border-border flex items-center justify-between gap-3">
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                      <div className="mt-auto pt-5 border-t border-white/5 d-flex items-center justify-between gap-4">
+                        <span className="text-xs text-muted uppercase tracking-widest font-bold opacity-60">
                           Max: {quiz.max_attempts} attempts
                         </span>
-                        <Link to={`/quiz/${quiz.id}`}>
-                          <GlassButton variant={status === 'not_started' ? 'primary' : 'secondary'} size="sm">
+                        <Link to={`/quiz/${quiz.id}`} style={{ textDecoration: 'none' }}>
+                          <GlassButton variant={status === 'not_started' ? 'primary' : 'secondary'} size="sm" className="px-5 shadow-sm font-bold">
                             {status === 'not_started' ? 'Start' : 'View'}
                           </GlassButton>
                         </Link>

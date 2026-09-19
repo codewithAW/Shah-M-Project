@@ -68,27 +68,30 @@ export function Settings() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-          <SettingsIcon className="h-8 w-8 text-primary" /> Settings
+    <div className="d-flex flex-col gap-8" style={{ maxWidth: '48rem', margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 className="dashboard-title text-3xl font-extrabold mb-2 d-flex items-center gap-4 tracking-tight">
+          <div className="stat-icon text-primary shadow-sm" style={{ width: '3rem', height: '3rem', borderRadius: '1rem', border: '1px solid rgba(var(--color-primary-rgb), 0.1)' }}>
+            <SettingsIcon style={{ height: '1.5rem', width: '1.5rem' }} />
+          </div>
+          Settings
         </h1>
-        <p className="text-muted-foreground">Manage your account settings and preferences.</p>
+        <p className="text-muted font-medium">Manage your account settings and preferences.</p>
       </div>
 
-      <GlassCard className="p-6 md:p-8">
-        <h3 className="text-xl font-bold mb-6 border-b border-glass-highlight pb-4">Personal Information</h3>
+      <GlassCard className="p-8">
+        <h3 className="text-xl font-bold mb-6 pb-4 tracking-tight" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Personal Information</h3>
         
         {profileMessage && (
-          <div className={`mb-6 p-3 rounded-xl border text-sm ${profileMessage.type === 'success' ? 'bg-success/10 border-success/20 text-success' : 'bg-error/10 border-error/20 text-error'}`}>
+          <div className="p-4 rounded-xl text-sm font-medium shadow-sm mb-6" style={profileMessage.type === 'success' ? { background: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-success)', border: '1px solid rgba(16, 185, 129, 0.2)' } : { background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
             {profileMessage.text}
           </div>
         )}
 
-        <form onSubmit={handleUpdateProfile} className="space-y-6">
-          <div className="grid grid-cols-1 gap-6">
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">Full Name</label>
+        <form onSubmit={handleUpdateProfile} className="d-flex flex-col gap-6">
+          <div className="d-flex flex-col gap-6">
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">Full Name</label>
               <GlassInput 
                 type="text" 
                 value={fullName}
@@ -96,53 +99,53 @@ export function Settings() {
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">Email</label>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">Email</label>
               <GlassInput 
                 type="email" 
                 value={profile?.email || ''}
                 disabled
-                className="opacity-70 cursor-not-allowed"
+                style={{ opacity: 0.6, cursor: 'not-allowed', background: 'rgba(0,0,0,0.05)' }}
               />
-              <p className="text-xs text-muted-foreground mt-2 ml-1">Email cannot be changed currently.</p>
+              <p className="text-xs font-medium text-muted mt-2 ml-1 opacity-80">Email cannot be changed currently.</p>
             </div>
           </div>
           
-          <div className="flex justify-end">
-            <GlassButton type="submit" variant="primary" disabled={isUpdatingProfile} className="gap-2">
-              <Save className="h-4 w-4" /> {isUpdatingProfile ? 'Saving...' : 'Save Changes'}
+          <div className="d-flex justify-end pt-4">
+            <GlassButton type="submit" variant="primary" disabled={isUpdatingProfile} className="px-6 shadow-sm font-bold d-flex items-center gap-2">
+              <Save style={{ height: '1rem', width: '1rem' }} /> {isUpdatingProfile ? 'Saving...' : 'Save Changes'}
             </GlassButton>
           </div>
         </form>
       </GlassCard>
 
-      <GlassCard className="p-6 md:p-8">
-        <h3 className="text-xl font-bold mb-6 border-b border-glass-highlight pb-4">Change Password</h3>
+      <GlassCard className="p-8">
+        <h3 className="text-xl font-bold mb-6 pb-4 tracking-tight" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Change Password</h3>
         
         {passwordMessage && (
-          <div className={`mb-6 p-3 rounded-xl border text-sm ${passwordMessage.type === 'success' ? 'bg-success/10 border-success/20 text-success' : 'bg-error/10 border-error/20 text-error'}`}>
+          <div className="p-4 rounded-xl text-sm font-medium shadow-sm mb-6" style={passwordMessage.type === 'success' ? { background: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-success)', border: '1px solid rgba(16, 185, 129, 0.2)' } : { background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
             {passwordMessage.text}
           </div>
         )}
 
-        <form onSubmit={handleUpdatePassword} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">New Password</label>
+        <form onSubmit={handleUpdatePassword} className="d-flex flex-col gap-6">
+          <div className="dashboard-grid cols-2">
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">New Password</label>
               <GlassInput 
                 type="password" 
-                icon={<Lock className="h-4 w-4" />}
+                icon={<Lock style={{ height: '1rem', width: '1rem' }} />}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">Confirm New Password</label>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">Confirm New Password</label>
               <GlassInput 
                 type="password" 
-                icon={<Lock className="h-4 w-4" />}
+                icon={<Lock style={{ height: '1rem', width: '1rem' }} />}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -151,9 +154,9 @@ export function Settings() {
             </div>
           </div>
           
-          <div className="flex justify-end">
-            <GlassButton type="submit" variant="secondary" disabled={isUpdatingPassword} className="gap-2">
-              <Lock className="h-4 w-4" /> {isUpdatingPassword ? 'Updating...' : 'Update Password'}
+          <div className="d-flex justify-end pt-4">
+            <GlassButton type="submit" variant="secondary" disabled={isUpdatingPassword} className="px-6 shadow-sm font-bold d-flex items-center gap-2">
+              <Lock style={{ height: '1rem', width: '1rem' }} /> {isUpdatingPassword ? 'Updating...' : 'Update Password'}
             </GlassButton>
           </div>
         </form>

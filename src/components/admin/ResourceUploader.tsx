@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { UploadCloud, File, Trash2, ExternalLink, X, FileText, Image, Film } from 'lucide-react';
+import { File, Trash2, ExternalLink, X, FileText, Image, Film } from 'lucide-react';
 import { GlassCard } from '../ui/GlassCard';
 import { GlassButton } from '../ui/GlassButton';
 import { GlassBadge } from '../ui/GlassBadge';
 import { resourceService } from '../../services/resourceService';
 import type { Resource, ResourceType } from '../../types';
+import Swal from 'sweetalert2';
 
 interface ResourceUploaderProps {
   courseId: string;
@@ -106,7 +107,18 @@ export function ResourceUploader({ courseId, lectureId, onClose }: ResourceUploa
   };
 
   const handleDelete = async (resource: Resource) => {
-    if (!confirm(`Are you sure you want to delete ${resource.title}?`)) return;
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `Are you sure you want to delete ${resource.title}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: 'var(--color-danger)',
+      cancelButtonColor: 'var(--color-primary)',
+      confirmButtonText: 'Yes, delete it!',
+      background: 'var(--color-glass-bg)',
+      color: 'var(--color-foreground)'
+    });
+    if (!result.isConfirmed) return;
     
     try {
       await resourceService.deleteResourceWithFile(resource);
@@ -117,8 +129,8 @@ export function ResourceUploader({ courseId, lectureId, onClose }: ResourceUploa
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <GlassCard className="w-full max-w-3xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="modal-overlay">
+      <GlassCard className="modal-content" style={{ maxWidth: '48rem', padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
         
         {/* Header */}
         <div className="p-6 border-b border-glass-highlight flex justify-between items-center bg-glass-highlight/30">
@@ -139,21 +151,37 @@ export function ResourceUploader({ courseId, lectureId, onClose }: ResourceUploa
           )}
 
           {/* Upload Area */}
-          <div className="border-2 border-dashed border-glass-highlight rounded-2xl p-8 text-center bg-glass/20 hover:bg-glass/40 transition-colors relative group">
+          <div className="p-8 text-center transition-colors relative" style={{ border: '2px dashed rgba(255,255,255,0.15)', borderRadius: '1rem', background: 'rgba(255,255,255,0.02)' }}>
             <input 
               type="file" 
+              id="resource-upload"
               ref={fileInputRef}
               onChange={handleFileUpload}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+              style={{ display: 'none' }}
               disabled={isUploading}
             />
-            <div className="pointer-events-none flex flex-col items-center gap-3">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                <UploadCloud className="h-6 w-6" />
-              </div>
+            <div className="d-flex flex-col items-center gap-3">
+              <label 
+                htmlFor="resource-upload" 
+                className="cursor-pointer shadow-sm transition-all"
+                style={{ 
+                  display: 'inline-block',
+                  padding: '0.625rem 1.5rem', 
+                  background: 'rgba(99, 102, 241, 0.1)', 
+                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  color: 'var(--color-primary)', 
+                  borderRadius: '9999px', 
+                  fontSize: 'var(--font-size-sm)', 
+                  fontWeight: 'bold' 
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)'}
+              >
+                Choose File
+              </label>
               <div>
-                <p className="font-semibold text-foreground">Click or drag files to upload</p>
-                <p className="text-xs text-muted-foreground mt-1">Supports PDF, Word, MP4, JPEG, PNG (Max 100MB)</p>
+                <p className="font-bold text-sm" style={{ color: 'var(--color-foreground)' }}>Click to select a file</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--color-muted-foreground)' }}>Supports PDF, Word, MP4, JPEG, PNG (Max 100MB)</p>
               </div>
             </div>
 
@@ -221,6 +249,12 @@ export function ResourceUploader({ courseId, lectureId, onClose }: ResourceUploa
               </div>
             )}
           </div>
+        </div>
+        
+        {/* Footer */}
+        <div className="p-4 border-t border-glass-highlight flex justify-end gap-3 bg-glass-highlight/20">
+          <GlassButton variant="ghost" onClick={onClose}>Cancel</GlassButton>
+          <GlassButton variant="primary" onClick={onClose}>Save</GlassButton>
         </div>
       </GlassCard>
     </div>

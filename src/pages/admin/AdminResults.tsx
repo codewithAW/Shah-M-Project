@@ -98,91 +98,101 @@ export function AdminResults() {
     }
   };
 
-  const filteredStudents = students.filter(student => 
+  const filteredStudents = students.filter(student =>
     student.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     student.roll_number?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="dashboard-container">
+      <div className="dashboard-header" style={{ alignItems: 'center' }}>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Student Results</h1>
-          <p className="text-muted-foreground mt-1">Overview of all student performances.</p>
+          <h1 className="dashboard-title">Student Results</h1>
+          <p className="text-muted font-medium mt-1">Overview of all student performances.</p>
         </div>
-        <div className="flex gap-2 w-full md:w-auto">
-          <div className="w-72">
-            <GlassInput 
-              placeholder="Search by name or roll number..." 
+        <div className="d-flex flex-wrap items-center gap-3" style={{ flex: '1 1 100%', width: '100%', minWidth: 0, justifyContent: 'space-between' }}>
+          <div style={{ flex: '1 1 100%', maxWidth: '100%' }}>
+            <GlassInput
+              placeholder="Search student or roll number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              icon={<Search className="h-4 w-4" />}
+              icon={<Search style={{ height: '1.25rem', width: '1.25rem' }} />}
             />
           </div>
-          <GlassButton variant="secondary" onClick={async () => {
-            if (!filteredStudents.length) return Swal.fire('No results to export');
-            const { exportToExcel } = await import('../../utils/exportUtils');
-            exportToExcel(filteredStudents, [
-              { header: 'Student', key: 'full_name' },
-              { header: 'Roll Number', key: 'roll_number' },
-              { header: 'Quiz Marks', key: 'quizMarks' },
-              { header: 'Assignment Marks', key: 'assignmentMarks' },
-              { header: 'Total Marks', key: 'totalMarks' }
-            ], 'Student_Results');
-          }}>Export Excel</GlassButton>
-          <GlassButton variant="secondary" onClick={async () => {
-            if (!filteredStudents.length) return Swal.fire('No results to export');
-            const { exportToPDF } = await import('../../utils/exportUtils');
-            exportToPDF(filteredStudents, [
-              { header: 'Student', key: 'full_name' },
-              { header: 'Roll Number', key: 'roll_number' },
-              { header: 'Quiz Marks', key: 'quizMarks' },
-              { header: 'Assignment Marks', key: 'assignmentMarks' },
-              { header: 'Total Marks', key: 'totalMarks' }
-            ], 'Student_Results', 'Overall Student Results');
-          }}>Export PDF</GlassButton>
+          <div className="d-flex items-center gap-2">
+            <GlassButton variant="secondary" className="shadow-sm btn-export" style={{ flexShrink: 0 }} onClick={async () => {
+              if (!filteredStudents.length) return Swal.fire('No results to export');
+              const { exportToExcel } = await import('../../utils/exportUtils');
+              exportToExcel(filteredStudents, [
+                { header: 'Student', key: 'full_name' },
+                { header: 'Roll Number', key: 'roll_number' },
+                { header: 'Quiz Marks', key: 'quizMarks' },
+                { header: 'Assignment Marks', key: 'assignmentMarks' },
+                { header: 'Total Marks', key: 'totalMarks' }
+              ], 'Student_Results');
+            }}>
+              <span className="export-icon" style={{ fontSize: '13px', fontWeight: 'bold' }}>Excel</span>
+              <span className="export-text">Export Excel</span>
+            </GlassButton>
+            <GlassButton variant="secondary" className="shadow-sm btn-export" style={{ flexShrink: 0 }} onClick={async () => {
+              if (!filteredStudents.length) return Swal.fire('No results to export');
+              const { exportToPDF } = await import('../../utils/exportUtils');
+              exportToPDF(filteredStudents, [
+                { header: 'Student', key: 'full_name' },
+                { header: 'Roll Number', key: 'roll_number' },
+                { header: 'Quiz Marks', key: 'quizMarks' },
+                { header: 'Assignment Marks', key: 'assignmentMarks' },
+                { header: 'Total Marks', key: 'totalMarks' }
+              ], 'Student_Results', 'Overall Student Results');
+            }}>
+              <span className="export-icon" style={{ fontSize: '13px', fontWeight: 'bold' }}>PDF</span>
+              <span className="export-text">Export PDF</span>
+            </GlassButton>
+          </div>
         </div>
       </div>
 
-      <GlassCard className="flex-1 p-6 relative overflow-hidden flex flex-col">
+      <GlassCard className="d-flex flex-col p-0 shadow-sm" style={{ flex: 1, overflow: 'hidden' }}>
         {isLoading ? (
-          <div className="flex justify-center p-12">
-            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+          <div className="d-flex items-center justify-center h-full p-6">
+            <div className="animate-spin h-8 w-8 rounded-full" style={{ border: '4px solid var(--color-primary)', borderTopColor: 'transparent' }}></div>
           </div>
         ) : filteredStudents.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <Award className="h-12 w-12 mb-4 opacity-20" />
-            <p>No results found.</p>
+          <div className="empty-state">
+            <div className="empty-state-icon">
+              <Award style={{ height: '3rem', width: '3rem', opacity: 0.5 }} />
+            </div>
+            <p className="empty-state-desc">No results found.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="text-xs text-muted-foreground uppercase bg-glass/50 border-b border-glass-highlight">
+          <div className="table-container p-6">
+            <table className="table">
+              <thead>
                 <tr>
-                  <th className="px-6 py-4 rounded-tl-xl font-medium">Student</th>
-                  <th className="px-6 py-4 font-medium">Roll Number</th>
-                  <th className="px-6 py-4 font-medium text-center">Quiz Marks</th>
-                  <th className="px-6 py-4 font-medium text-center">Assignment Marks</th>
-                  <th className="px-6 py-4 font-medium text-center">Total Marks</th>
-                  <th className="px-6 py-4 rounded-tr-xl"></th>
+                  <th>Student</th>
+                  <th>Roll Number</th>
+                  <th style={{ textAlign: 'center' }}>Quiz Marks</th>
+                  <th style={{ textAlign: 'center' }}>Assignment Marks</th>
+                  <th style={{ textAlign: 'center' }}>Total Marks</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredStudents.map((student) => (
-                  <tr key={student.id} className="border-b border-glass-highlight/50 hover:bg-glass/30 transition-colors">
-                    <td className="px-6 py-4 font-medium flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
+                  <tr key={student.id}>
+                    <td className="font-bold d-flex items-center gap-4">
+                      <div className="d-flex items-center justify-center font-bold text-sm" style={{ height: '2.5rem', width: '2.5rem', borderRadius: '50%', background: 'rgba(var(--color-primary-rgb), 0.1)', color: 'var(--color-primary)', border: '1px solid rgba(var(--color-primary-rgb), 0.2)' }}>
                         {student.full_name?.substring(0, 2).toUpperCase()}
                       </div>
                       {student.full_name}
                     </td>
-                    <td className="px-6 py-4 text-muted-foreground">{student.roll_number}</td>
-                    <td className="px-6 py-4 text-center">{student.quizMarks}</td>
-                    <td className="px-6 py-4 text-center">{student.assignmentMarks}</td>
-                    <td className="px-6 py-4 text-center font-bold text-primary">{student.totalMarks}</td>
-                    <td className="px-6 py-4 text-right">
-                      <Link to={`/teacher/results/${student.id}`} className="inline-flex items-center justify-center p-2 rounded-lg hover:bg-glass text-muted-foreground hover:text-foreground transition-colors">
-                        <ChevronRight className="h-4 w-4" />
+                    <td className="text-muted">{student.roll_number}</td>
+                    <td className="font-bold" style={{ textAlign: 'center' }}>{student.quizMarks}</td>
+                    <td className="font-bold" style={{ textAlign: 'center' }}>{student.assignmentMarks}</td>
+                    <td className="font-bold text-primary" style={{ textAlign: 'center' }}>{student.totalMarks}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <Link to={`/teacher/results/${student.id}`} className="btn-icon shadow-sm" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-muted)' }}>
+                        <ChevronRight style={{ height: '1.25rem', width: '1.25rem' }} />
                       </Link>
                     </td>
                   </tr>

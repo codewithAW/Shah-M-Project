@@ -6,17 +6,29 @@ export function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    setIsDark(isDarkMode);
+    // Check local storage or system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDarkMode = savedTheme === 'dark' || (!savedTheme && systemDark);
+    
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    }
   }, []);
 
   const toggleTheme = () => {
     const root = document.documentElement;
     if (root.classList.contains('dark')) {
       root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
       setIsDark(false);
     } else {
       root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
       setIsDark(true);
     }
   };

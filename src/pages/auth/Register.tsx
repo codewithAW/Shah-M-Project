@@ -28,7 +28,7 @@ export function Register() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/register-student', {
+      const response = await fetch('/api/auth/register-student', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -57,79 +57,79 @@ export function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-background">
+    <div className="auth-container">
       {/* Background Orbs */}
-      <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-accent/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      <div className="auth-glow-1"></div>
+      <div className="auth-glow-2"></div>
 
-      <div className="glass-panel w-full max-w-md p-8 rounded-3xl relative z-10 shadow-2xl">
-        <div className="flex flex-col items-center mb-8">
-          <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-            <BookOpen className="h-6 w-6" />
+      <div className="glass-card auth-card">
+        <div className="auth-header">
+          <div className="auth-header-icon">
+            <BookOpen style={{ height: '1.5rem', width: '1.5rem' }} />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">Student Registration</h2>
-          <p className="text-sm text-muted-foreground mt-2">Start your learning journey today</p>
+          <h2 className="auth-title">Student Registration</h2>
+          <p className="auth-subtitle">Start your learning journey today</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-3 rounded-xl bg-error/10 border border-error/20 text-error text-sm text-center">
+          <div className="glass-card" style={{ padding: 'var(--space-3)', marginBottom: 'var(--space-6)', backgroundColor: 'rgba(239,68,68,0.1)', borderColor: 'rgba(239,68,68,0.2)', color: 'var(--color-danger)', textAlign: 'center', fontSize: 'var(--font-size-sm)' }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleRegister} className="space-y-6">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">Full Name</label>
+        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            <div className="auth-form-group">
+              <label className="auth-label">Full Name</label>
               <GlassInput 
                 type="text" 
                 placeholder="John Doe" 
-                icon={<User className="h-4 w-4" />}
+                icon={<User style={{ height: '1rem', width: '1rem' }} />}
                 required
                 value={name}
                 onChange={e => setName(e.target.value)}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">Username</label>
+            <div className="auth-form-group">
+              <label className="auth-label">Username</label>
               <GlassInput 
                 type="text" 
                 placeholder="johndoe123" 
-                icon={<User className="h-4 w-4" />}
+                icon={<User style={{ height: '1rem', width: '1rem' }} />}
                 required
                 value={username}
                 onChange={e => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">Roll Number</label>
+            <div className="auth-form-group">
+              <label className="auth-label">Roll Number</label>
               <GlassInput 
                 type="text" 
                 placeholder="Ex: 2023CS001" 
-                icon={<Hash className="h-4 w-4" />}
+                icon={<Hash style={{ height: '1rem', width: '1rem' }} />}
                 required
                 value={rollNumber}
                 onChange={e => setRollNumber(e.target.value.toUpperCase().replace(/\s+/g, ''))}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">Password</label>
+            <div className="auth-form-group">
+              <label className="auth-label">Password</label>
               <GlassInput 
                 type="password" 
                 placeholder="••••••••" 
-                icon={<Lock className="h-4 w-4" />}
+                icon={<Lock style={{ height: '1rem', width: '1rem' }} />}
                 required
                 minLength={6}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">Confirm Password</label>
+            <div className="auth-form-group">
+              <label className="auth-label">Confirm Password</label>
               <GlassInput 
                 type="password" 
                 placeholder="••••••••" 
-                icon={<Lock className="h-4 w-4" />}
+                icon={<Lock style={{ height: '1rem', width: '1rem' }} />}
                 required
                 minLength={6}
                 value={confirmPassword}
@@ -138,14 +138,14 @@ export function Register() {
             </div>
           </div>
 
-          <GlassButton variant="primary" className="w-full h-12" type="submit" disabled={isLoading}>
+          <GlassButton variant="primary" style={{ width: '100%', height: '3rem' }} type="submit" disabled={isLoading}>
             {isLoading ? 'Creating account...' : 'Create account'}
           </GlassButton>
         </form>
 
-        <p className="mt-8 text-center text-sm text-muted-foreground">
+        <p className="auth-footer">
           Already have an account?{' '}
-          <Link to="/login" className="font-medium text-primary hover:underline">
+          <Link to="/login" style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--color-primary)', textDecoration: 'none' }}>
             Sign in
           </Link>
         </p>

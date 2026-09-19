@@ -7,55 +7,64 @@ export function Profile() {
   const { profile, user } = useAuth();
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">My Profile</h1>
-        <p className="text-muted-foreground">Manage your public presence and academic identity.</p>
+    <div className="d-flex flex-col gap-8" style={{ maxWidth: '56rem', margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 className="dashboard-title text-3xl font-bold mb-2">My Profile</h1>
+        <p className="text-muted">Manage your public presence and academic identity.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-1">
-          <GlassCard className="p-8 flex flex-col items-center text-center">
-            <div className="h-32 w-32 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-6 border-4 border-background shadow-xl">
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt={profile.full_name} className="h-full w-full rounded-full object-cover" />
-              ) : (
-                <UserCircle className="h-16 w-16" />
-              )}
+      <div className="dashboard-grid cols-3">
+        <div style={{ gridColumn: 'span 1 / span 1' }}>
+          <GlassCard className="p-8 d-flex flex-col items-center text-center">
+            <div className="relative" style={{ marginBottom: '1.5rem' }}>
+              <div className="absolute inset-0 rounded-full" style={{ background: 'rgba(var(--color-primary-rgb), 0.2)', filter: 'blur(20px)', transform: 'translateY(0.5rem)' }}></div>
+              <div className="relative rounded-full d-flex items-center justify-center text-primary shadow-sm" style={{ width: '9rem', height: '9rem', background: 'linear-gradient(to bottom right, rgba(var(--color-primary-rgb), 0.2), rgba(var(--color-primary-rgb), 0.05))', border: '6px solid rgba(255,255,255,0.1)', zIndex: 10 }}>
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt={profile.full_name} style={{ height: '100%', width: '100%', borderRadius: '9999px', objectFit: 'cover' }} />
+                ) : (
+                  <UserCircle style={{ height: '4rem', width: '4rem' }} />
+                )}
+              </div>
             </div>
-            <h2 className="text-2xl font-bold mb-1">{profile?.full_name || 'Loading...'}</h2>
-            <p className="text-muted-foreground mb-4">{profile?.email || user?.email}</p>
-            <GlassBadge variant={profile?.role === 'teacher' ? 'success' : 'primary'} className="uppercase tracking-widest text-xs px-4 py-1">
+            <h2 className="text-3xl font-extrabold tracking-tight mb-1">{profile?.full_name || 'Loading...'}</h2>
+            <p className="text-sm font-medium text-muted mb-6">{profile?.email || user?.email}</p>
+            <GlassBadge variant={profile?.role === 'teacher' ? 'success' : 'primary'} className="uppercase tracking-widest text-xs font-bold shadow-sm" style={{ padding: '0.375rem 1.25rem' }}>
               {profile?.role || 'student'}
             </GlassBadge>
           </GlassCard>
         </div>
 
-        <div className="md:col-span-2 space-y-6">
-          <GlassCard className="p-6">
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-primary" /> Academic Information
-            </h3>
-            <div className="space-y-4">
-              <div className="flex justify-between py-3 border-b border-glass-highlight">
-                <span className="text-muted-foreground">Status</span>
-                <span className="font-medium text-foreground">Active</span>
+        <div className="d-flex flex-col gap-6" style={{ gridColumn: 'span 2 / span 2' }}>
+          <GlassCard className="p-8">
+            <h3 className="text-xl font-bold mb-6 d-flex items-center gap-3 tracking-tight">
+              <div className="stat-icon text-primary shadow-sm" style={{ width: '2.5rem', height: '2.5rem', borderRadius: '0.8rem', background: 'linear-gradient(to bottom right, rgba(var(--color-primary-rgb), 0.2), rgba(var(--color-primary-rgb), 0.05))', border: '1px solid rgba(var(--color-primary-rgb), 0.1)' }}>
+                <BookOpen style={{ height: '1.25rem', width: '1.25rem' }} />
               </div>
-              <div className="flex justify-between py-3 border-b border-glass-highlight">
-                <span className="text-muted-foreground">Enrolled Since</span>
-                <span className="font-medium text-foreground">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</span>
+              Academic Information
+            </h3>
+            <div className="d-flex flex-col gap-4">
+              <div className="d-flex justify-between py-4 border-b border-white/5">
+                <span className="text-muted font-medium">Status</span>
+                <GlassBadge variant="success" className="font-bold shadow-sm">Active</GlassBadge>
+              </div>
+              <div className="d-flex justify-between py-4 border-b border-white/5">
+                <span className="text-muted font-medium">Enrolled Since</span>
+                <span className="font-bold">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</span>
               </div>
             </div>
           </GlassCard>
 
-          <GlassCard className="p-6">
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" /> Account Security
+          <GlassCard className="p-8">
+            <h3 className="text-xl font-bold mb-6 d-flex items-center gap-3 tracking-tight">
+              <div className="stat-icon shadow-sm" style={{ width: '2.5rem', height: '2.5rem', borderRadius: '0.8rem', background: 'linear-gradient(to bottom right, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.05))', color: 'rgb(6, 182, 212)', border: '1px solid rgba(6, 182, 212, 0.1)' }}>
+                <Shield style={{ height: '1.25rem', width: '1.25rem' }} />
+              </div>
+              Account Security
             </h3>
-            <div className="space-y-4">
-              <div className="flex justify-between py-3 border-b border-glass-highlight">
-                <span className="text-muted-foreground flex items-center gap-2"><Mail className="h-4 w-4" /> Email Address</span>
-                <span className="font-medium text-foreground">{user?.email}</span>
+            <div className="d-flex flex-col gap-4">
+              <div className="d-flex justify-between py-4 border-b border-white/5">
+                <span className="text-muted font-medium d-flex items-center gap-2"><Mail style={{ height: '1rem', width: '1rem', opacity: 0.7 }} /> Email Address</span>
+                <span className="font-bold">{user?.email}</span>
               </div>
             </div>
           </GlassCard>

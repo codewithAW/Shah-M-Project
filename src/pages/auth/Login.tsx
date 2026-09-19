@@ -85,72 +85,66 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-background">
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+    <div className="auth-container">
+      <div className="auth-glow-1"></div>
+      <div className="auth-glow-2"></div>
 
-      <div className="glass-panel w-full max-w-md p-8 rounded-3xl relative z-10 shadow-2xl">
-        <div className="flex flex-col items-center mb-6">
-          <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
-            <BookOpen className="h-6 w-6" />
+      <div className="glass-card auth-card">
+        <div className="auth-header">
+          <div className="auth-header-icon">
+            <BookOpen style={{ height: '1.5rem', width: '1.5rem' }} />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">Welcome back</h2>
-          <p className="text-sm text-muted-foreground mt-2">Sign in to your account</p>
+          <h2 className="auth-title">Welcome back</h2>
+          <p className="auth-subtitle">Sign in to your account</p>
         </div>
 
         {/* Custom Tab Selector */}
-        <div className="flex p-1 mb-8 bg-black/20 rounded-xl">
+        <div className="auth-tabs">
           <button
             type="button"
             onClick={() => resetForm('student')}
-            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-              activeTab === 'student' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`auth-tab ${activeTab === 'student' ? 'is-active' : ''}`}
           >
             Student
           </button>
           <button
             type="button"
             onClick={() => resetForm('teacher')}
-            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-              activeTab === 'teacher' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`auth-tab ${activeTab === 'teacher' ? 'is-active' : ''}`}
           >
             Teacher
           </button>
           <button
             type="button"
             onClick={() => resetForm('admin')}
-            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-              activeTab === 'admin' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`auth-tab ${activeTab === 'admin' ? 'is-active' : ''}`}
           >
             Admin
           </button>
         </div>
 
         {message && (
-          <div className="mb-6 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-sm text-center">
+          <div className="glass-card" style={{ padding: 'var(--space-3)', marginBottom: 'var(--space-6)', backgroundColor: 'rgba(16,185,129,0.1)', borderColor: 'rgba(16,185,129,0.2)', color: 'var(--color-success)', textAlign: 'center', fontSize: 'var(--font-size-sm)' }}>
             {message}
           </div>
         )}
 
         {error && (
-          <div className="mb-6 p-3 rounded-xl bg-error/10 border border-error/20 text-error text-sm text-center">
+          <div className="glass-card" style={{ padding: 'var(--space-3)', marginBottom: 'var(--space-6)', backgroundColor: 'rgba(239,68,68,0.1)', borderColor: 'rgba(239,68,68,0.2)', color: 'var(--color-danger)', textAlign: 'center', fontSize: 'var(--font-size-sm)' }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
           <motion.div 
             key={activeTab}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="space-y-4"
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}
           >
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">
+            <div className="auth-form-group">
+              <label className="auth-label">
                 {activeTab === 'student' ? 'Roll Number' : activeTab === 'teacher' ? 'Teacher ID' : 'Admin Email'}
               </label>
               <GlassInput 
@@ -161,21 +155,21 @@ export function Login() {
                   "admin@example.com"
                 } 
                 icon={
-                  activeTab === 'student' ? <Hash className="h-4 w-4" /> : 
-                  activeTab === 'teacher' ? <User className="h-4 w-4" /> : 
-                  <Mail className="h-4 w-4" />
+                  activeTab === 'student' ? <Hash style={{ height: '1rem', width: '1rem' }} /> : 
+                  activeTab === 'teacher' ? <User style={{ height: '1rem', width: '1rem' }} /> : 
+                  <Mail style={{ height: '1rem', width: '1rem' }} />
                 }
                 required
                 value={identifier}
                 onChange={e => setIdentifier(e.target.value)}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5 ml-1">Password</label>
+            <div className="auth-form-group">
+              <label className="auth-label">Password</label>
               <GlassInput 
                 type="password" 
                 placeholder="••••••••" 
-                icon={<Lock className="h-4 w-4" />}
+                icon={<Lock style={{ height: '1rem', width: '1rem' }} />}
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -183,27 +177,27 @@ export function Login() {
             </div>
           </motion.div>
 
-          <div className="flex items-center justify-between text-sm">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 'var(--font-size-sm)' }}>
             <div />
             {activeTab === 'student' && (
-              <Link to="/forgot-password" className="font-medium text-primary hover:underline">Forgot password?</Link>
+              <Link to="/forgot-password" style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--color-primary)', textDecoration: 'none' }}>Forgot password?</Link>
             )}
             {activeTab === 'admin' && (
-              <span className="text-muted-foreground flex items-center gap-1 text-xs">
-                <ShieldAlert className="h-3 w-3" /> Privileged Access
+              <span style={{ color: 'var(--color-muted-foreground)', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: 'var(--font-size-xs)' }}>
+                <ShieldAlert style={{ height: '0.75rem', width: '0.75rem' }} /> Privileged Access
               </span>
             )}
           </div>
 
-          <GlassButton variant="primary" className="w-full h-12" type="submit" disabled={isLoading}>
+          <GlassButton variant="primary" style={{ width: '100%', height: '3rem' }} type="submit" disabled={isLoading}>
             {isLoading ? 'Signing in...' : 'Sign in'}
           </GlassButton>
         </form>
 
         {activeTab === 'student' && (
-          <p className="mt-8 text-center text-sm text-muted-foreground">
+          <p className="auth-footer">
             Don't have an account?{' '}
-            <Link to="/register" className="font-medium text-primary hover:underline">
+            <Link to="/register" style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--color-primary)', textDecoration: 'none' }}>
               Sign up for free
             </Link>
           </p>

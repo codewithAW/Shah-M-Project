@@ -39,6 +39,7 @@ export interface Lecture {
   id: string;
   course_id: string;
   title: string;
+  subject?: string | null;
   slug: string | null;
   description: string | null;
   content: string | null;

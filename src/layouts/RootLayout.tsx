@@ -4,10 +4,10 @@ import { Footer } from '../components/layout/Footer';
 
 export function RootLayout() {
   return (
-    <div className="flex min-h-screen flex-col relative">
+    <div className="app-shell">
       <div className="app-background" />
       <Navbar />
-      <main className="flex-1">
+      <main className="main-content">
         <Outlet />
       </main>
       <Footer />

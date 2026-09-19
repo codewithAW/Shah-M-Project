@@ -1,8 +1,9 @@
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
+import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.js?url';
 import Tesseract from 'tesseract.js';
 
-// Setup PDF.js worker using CDN to avoid Vite build issues with the local worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Setup PDF.js worker using local import via Vite
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 
 export interface DraftOption {
   option_text: string;

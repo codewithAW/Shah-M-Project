@@ -8,26 +8,18 @@ export interface GlassInputProps extends React.InputHTMLAttributes<HTMLInputElem
 export const GlassInput = React.forwardRef<HTMLInputElement, GlassInputProps>(
   ({ className, type, icon, ...props }, ref) => {
     return (
-      <div className="relative">
+      <div style={{ position: 'relative', width: '100%' }}>
         {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+          <div style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-muted-foreground)', pointerEvents: 'none', display: 'flex', alignItems: 'center', zIndex: 2 }}>
             {icon}
           </div>
         )}
         <input
           type={type}
-          className={cn(
-            'flex h-10 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm',
-            'transition-colors duration-200',
-            'placeholder:text-muted-foreground',
-            'focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary',
-            'disabled:cursor-not-allowed disabled:opacity-50',
-            'file:border-0 file:bg-transparent file:text-sm file:font-medium',
-            icon && 'pl-10',
-            className
-          )}
+          className={cn('form-input', className)}
           ref={ref}
           {...props}
+          style={{ paddingLeft: icon ? '2.75rem' : undefined, ...props.style }}
         />
       </div>
     );

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Clock, CheckCircle, AlertTriangle, List, ArrowLeft, ArrowRight } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { GlassButton } from '../../components/ui/GlassButton';
 import { GlassCard } from '../../components/ui/GlassCard';
@@ -474,11 +474,11 @@ export function Quiz() {
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto whitespace-pre-wrap">{quiz.instructions || quiz.description}</p>
           
           {quiz.is_integrity_mode_enabled && !isPreview && (
-            <div className="mb-8 p-4 rounded-xl border border-warning/50 bg-warning/10 text-left flex items-start gap-3 max-w-xl mx-auto">
-              <AlertTriangle className="text-warning h-5 w-5 shrink-0 mt-0.5" />
+            <div className="mb-8 p-6 text-center flex flex-col items-center gap-3 max-w-xl mx-auto shadow-sm" style={{ backgroundColor: '#fffbeb', border: '2px solid #eab308', borderRadius: '1.5rem' }}>
+              <AlertTriangle className="h-8 w-8" style={{ color: '#d97706' }} />
               <div>
-                <h4 className="font-bold text-warning mb-1">Exam Integrity Mode is Enabled</h4>
-                <p className="text-sm text-foreground/80">
+                <h4 className="font-bold mb-2 text-lg" style={{ color: '#d97706' }}>Exam Integrity Mode is Enabled</h4>
+                <p className="text-sm leading-relaxed" style={{ color: '#451a03' }}>
                   This quiz is monitored. Leaving the tab, exiting fullscreen, or attempting to copy/paste will be recorded and flagged to your teacher. Please ensure you are ready before starting.
                 </p>
               </div>
@@ -499,32 +499,31 @@ export function Quiz() {
           </div>
 
           {!isPreview && (
-            <div className="text-sm text-muted-foreground mb-8 text-left space-y-2 max-w-sm mx-auto">
+            <div className="text-sm text-muted-foreground mb-8 text-center space-y-2 max-w-sm mx-auto">
               <p>• Make sure you have a stable internet connection.</p>
               <p>• Do not refresh the page during the quiz.</p>
             </div>
           )}
 
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-4 w-full">
             {latestAttempt?.status === 'cheating_detected' ? (
-              <div className="flex flex-col items-center justify-center space-y-4">
-                <GlassButton variant="secondary" size="lg" className="w-full sm:w-auto px-12 border-error text-error bg-error/10 cursor-not-allowed opacity-100 font-bold" disabled>
-                  <AlertTriangle className="h-5 w-5 mr-2 inline-block" />
-                  Cheating Detected
-                </GlassButton>
-                <p className="text-sm text-error/80 font-medium">No submission accepted.</p>
+              <div className="w-full p-4 flex flex-col items-center justify-center gap-2 text-center" style={{ backgroundColor: '#fef2f2', color: '#ef4444', border: '2px solid #ef4444', borderRadius: '1rem' }}>
+                <AlertTriangle className="h-7 w-7" />
+                <h4 className="font-bold text-lg m-0">Cheating Detected</h4>
+                <p className="text-sm font-medium m-0">No submission accepted.</p>
               </div>
             ) : ['submitted', 'auto_submitted', 'graded'].includes(latestAttempt?.status || '') ? (
-              <>
-                <GlassButton variant="secondary" size="lg" className="w-full sm:w-auto px-12 bg-success/20 text-success border-success cursor-not-allowed opacity-100 font-bold" disabled>
-                  Quiz Submitted Successfully
-                </GlassButton>
-                <GlassButton variant="primary" size="lg" className="w-full sm:w-auto px-12" onClick={handleViewResults}>
+              <div className="w-full flex flex-col gap-4">
+                <div className="w-full p-4 flex flex-col items-center justify-center gap-2 text-center" style={{ backgroundColor: '#f0fdf4', color: '#10b981', border: '2px solid #10b981', borderRadius: '1rem' }}>
+                  <CheckCircle className="h-7 w-7" />
+                  <h4 className="font-bold text-lg m-0">Quiz Submitted Successfully</h4>
+                </div>
+                <GlassButton variant="primary" size="lg" className="w-full" onClick={handleViewResults}>
                   View Results
                 </GlassButton>
-              </>
+              </div>
             ) : (
-              <GlassButton variant="primary" size="lg" className="w-full sm:w-auto px-12" onClick={handleStart}>
+              <GlassButton variant="primary" size="lg" className="w-full px-12" onClick={handleStart}>
                 {isPreview ? 'Start Preview' : latestAttempt?.status === 'in_progress' ? 'Resume Quiz' : 'Start Quiz Now'}
               </GlassButton>
             )}
@@ -549,40 +548,40 @@ export function Quiz() {
             const q = ans.quiz_questions;
             const isCorrect = ans.is_correct;
             return (
-              <GlassCard key={ans.id} className={`p-6 border-l-4 ${isCorrect === true ? 'border-l-success' : isCorrect === false ? 'border-l-error' : 'border-l-glass-highlight'}`}>
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-medium"><span className="text-muted-foreground mr-2">{idx + 1}.</span> {q.question_text}</h3>
-                  <div className={`text-sm font-bold ${isCorrect === true ? 'text-success' : isCorrect === false ? 'text-error' : 'text-muted-foreground'}`}>
+              <GlassCard key={ans.id} className={`p-6 md:p-8 border-l-4 ${isCorrect === true ? 'border-l-success' : isCorrect === false ? 'border-l-danger' : 'border-l-border/50'}`}>
+                <div className="flex justify-between items-start mb-6">
+                  <h3 className="font-medium text-lg"><span className="text-muted-foreground mr-2">{idx + 1}.</span> {q.question_text}</h3>
+                  <div className={`text-sm font-bold shrink-0 ml-4 px-3 py-1 rounded-full ${isCorrect === true ? 'bg-success/10 text-success' : isCorrect === false ? 'bg-danger/10 text-danger' : 'bg-secondary text-muted-foreground'}`}>
                     {ans.marks_awarded} / {q.marks} Marks
                   </div>
                 </div>
 
                 {(q.question_type === 'mcq' || q.question_type === 'true_false') && q.quiz_question_options && (
-                  <div className="space-y-2 mt-4 ml-6">
+                  <div className="space-y-3 mt-4 ml-6">
                     {q.quiz_question_options.map((opt: any) => {
                       // If the student selected this option
                       const isSelected = ans.selected_option_id === opt.id;
                       const isActuallyCorrect = opt.is_correct;
                       
-                      let bgClass = 'bg-glass/50 border-glass-highlight';
+                      let bgClass = 'bg-white/40 dark:bg-black/20 border-white/10 dark:border-white/5 backdrop-blur-sm';
                       let textClass = 'text-foreground';
                       
                       if (isSelected && isCorrect) {
-                        bgClass = 'bg-success/20 border-success shadow-[0_0_10px_rgba(34,197,94,0.2)]';
+                        bgClass = 'bg-success/20 dark:bg-success/10 border-success shadow-sm';
                         textClass = 'text-success font-bold';
                       } else if (isSelected && !isCorrect) {
-                        bgClass = 'bg-error/20 border-error shadow-[0_0_10px_rgba(239,68,68,0.2)]';
-                        textClass = 'text-error font-bold';
+                        bgClass = 'bg-danger/20 dark:bg-danger/10 border-danger shadow-sm';
+                        textClass = 'text-danger font-bold';
                       } else if (isActuallyCorrect) {
                         // Highlight the actual correct answer that they missed
-                        bgClass = 'bg-success/10 border-success/50 border-dashed';
+                        bgClass = 'bg-success/5 border-success/30 border-dashed';
                         textClass = 'text-success font-semibold';
                       }
 
                       return (
-                        <div key={opt.id} className={`p-3 rounded-lg border ${bgClass} transition-colors flex justify-between items-center`}>
+                        <div key={opt.id} className={`p-4 rounded-xl border ${bgClass} transition-colors flex justify-between items-center`}>
                           <span className={textClass}>{opt.option_text}</span>
-                          {isSelected && <span className="text-xs opacity-70 ml-2">(Your Answer)</span>}
+                          {isSelected && <span className="text-xs font-bold uppercase tracking-wider opacity-60 ml-2">(Your Answer)</span>}
                         </div>
                       );
                     })}
@@ -590,9 +589,9 @@ export function Quiz() {
                 )}
                 
                 {(q.question_type === 'short_answer' || q.question_type === 'written') && (
-                  <div className="mt-4 ml-6 p-4 rounded-lg bg-glass/20 border border-glass-highlight">
-                    <p className="text-sm font-medium mb-1 text-muted-foreground">Your Answer:</p>
-                    <p className="text-sm">{ans.answer_text || 'No answer provided'}</p>
+                  <div className="mt-6 ml-6 p-5 rounded-xl bg-white/40 dark:bg-black/20 backdrop-blur-md border border-white/10 dark:border-white/5 shadow-inner">
+                    <p className="text-xs uppercase tracking-wider font-bold mb-2 text-muted-foreground opacity-70">Your Answer</p>
+                    <p className="text-base leading-relaxed">{ans.answer_text || 'No answer provided'}</p>
                   </div>
                 )}
               </GlassCard>
@@ -683,30 +682,93 @@ export function Quiz() {
       </div>
 
       {/* Question Card */}
-      <GlassCard className="p-8 mb-8 min-h-[300px]">
-        <div className="flex justify-between items-start mb-6">
-          <h3 className="text-xl font-medium leading-relaxed">{question.question_text}</h3>
-          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap ml-4">
+      <GlassCard style={{ padding: '2rem', marginBottom: '2rem', minHeight: '300px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.25rem 0.75rem', borderRadius: '9999px', background: 'var(--color-primary)', color: '#fff', fontSize: '0.75rem', fontWeight: 600, marginBottom: '1rem', opacity: 0.8 }}>
+              <List style={{ width: '0.875rem', height: '0.875rem' }} />
+              {question.question_type === 'mcq' ? 'Multiple Choice' : 'True or False'}
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, lineHeight: 1.6, color: 'var(--color-foreground)', margin: 0 }}>{question.question_text}</h3>
+          </div>
+          <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-muted-foreground)', whiteSpace: 'nowrap', marginLeft: '1rem', marginTop: '0.5rem' }}>
             {question.marks} Marks
           </span>
         </div>
 
         {(question.question_type === 'mcq' || question.question_type === 'true_false') && question.options && (
-          <div className="space-y-3 mt-8">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '2rem' }}>
             {question.options.map((option, idx) => {
               const isSelected = answers[question.id]?.optionId === option.id;
               return (
                 <button
                   key={option.id}
                   onClick={() => setAnswers(prev => ({ ...prev, [question.id]: { optionId: option.id, text: null } }))}
-                  className={`w-full text-left p-4 rounded-xl border transition-all ${
-                    isSelected 
-                      ? 'border-primary bg-primary/10 text-primary shadow-sm ring-1 ring-primary' 
-                      : 'border-glass-highlight bg-glass/50 hover:bg-glass hover:border-muted-foreground'
-                  }`}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '1rem',
+                    borderRadius: '9999px',
+                    transition: 'all 0.2s',
+                    cursor: 'pointer',
+                    background: isSelected ? 'var(--color-glass-hover)' : 'var(--color-glass-bg)',
+                    border: isSelected ? '1px solid var(--color-primary)' : '1px solid var(--color-glass-border)',
+                    boxShadow: isSelected ? '0 1px 2px rgba(0,0,0,0.05), 0 0 0 1px var(--color-primary)' : 'none',
+                    backdropFilter: 'blur(8px)',
+                    outline: 'none'
+                  }}
+                  onMouseEnter={e => {
+                    if (!isSelected) {
+                      e.currentTarget.style.background = 'var(--color-glass-hover)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!isSelected) {
+                      e.currentTarget.style.background = 'var(--color-glass-bg)';
+                    }
+                  }}
                 >
-                  <span className="inline-block w-6 font-medium opacity-50 mr-2">{String.fromCharCode(65 + idx)}.</span>
-                  {option.option_text}
+                  <div style={{
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '1.25rem',
+                    height: '1.25rem',
+                    borderRadius: '9999px',
+                    border: isSelected ? '2px solid var(--color-primary)' : '2px solid var(--color-muted-foreground)',
+                    marginRight: '1rem',
+                    transition: 'all 0.2s'
+                  }}>
+                     {isSelected && <div style={{ width: '0.625rem', height: '0.625rem', borderRadius: '9999px', backgroundColor: 'var(--color-primary)' }}></div>}
+                  </div>
+
+                  <div style={{
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '2rem',
+                    height: '2rem',
+                    borderRadius: '9999px',
+                    fontSize: '0.875rem',
+                    fontWeight: 700,
+                    marginRight: '1rem',
+                    transition: 'all 0.2s',
+                    backgroundColor: isSelected ? 'var(--color-primary)' : 'var(--color-border)',
+                    color: isSelected ? '#fff' : 'var(--color-foreground)',
+                    opacity: isSelected ? 1 : 0.7
+                  }}>
+                    {String.fromCharCode(65 + idx)}
+                  </div>
+                  
+                  <span style={{
+                    fontSize: '1rem',
+                    textAlign: 'left',
+                    fontWeight: isSelected ? 500 : 400,
+                    color: 'var(--color-foreground)'
+                  }}>{option.option_text}</span>
                 </button>
               );
             })}
@@ -714,34 +776,76 @@ export function Quiz() {
         )}
 
         {(question.question_type === 'short_answer' || question.question_type === 'written') && (
-          <div className="mt-8">
+          <div style={{ marginTop: '2rem' }}>
             <textarea
-              className="w-full h-48 rounded-xl border border-glass-highlight bg-glass/50 p-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none transition-colors"
+              style={{
+                width: '100%',
+                height: '12rem',
+                borderRadius: '1rem',
+                border: '1px solid var(--color-glass-border)',
+                background: 'var(--color-glass-bg)',
+                padding: '1.5rem',
+                color: 'var(--color-foreground)',
+                outline: 'none',
+                resize: 'none',
+                transition: 'all 0.2s',
+                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)',
+                fontSize: '1rem',
+                lineHeight: 1.6
+              }}
               placeholder="Type your detailed answer here..."
               value={answers[question.id]?.text || ''}
               onChange={e => setAnswers(prev => ({ ...prev, [question.id]: { optionId: null, text: e.target.value } }))}
+              onFocus={e => {
+                e.currentTarget.style.borderColor = 'var(--color-primary)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(67, 56, 202, 0.2)';
+              }}
+              onBlur={e => {
+                e.currentTarget.style.borderColor = 'var(--color-glass-border)';
+                e.currentTarget.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.05)';
+              }}
             ></textarea>
           </div>
         )}
       </GlassCard>
 
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-20">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5rem', padding: '0 1rem' }}>
         <GlassButton 
           variant="secondary" 
           onClick={handlePrev}
           disabled={currentQuestionIdx === 0}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '9999px', padding: '0.5rem 1.5rem', fontWeight: 500 }}
         >
-          Previous
+          <ArrowLeft style={{ width: '1rem', height: '1rem' }} /> Previous
         </GlassButton>
 
         {currentQuestionIdx === questions.length - 1 ? (
-          <GlassButton variant="primary" onClick={() => submitAttempt(false)} disabled={isSubmitting}>
-            {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
+          <GlassButton 
+            variant="primary"
+            onClick={() => {
+              if (Object.keys(answers).length < questions.length) {
+                Swal.fire({
+                  title: 'Incomplete',
+                  text: 'Please answer all questions before submitting.',
+                  icon: 'warning',
+                  confirmButtonColor: '#4338ca'
+                });
+                return;
+              }
+              submitAttemptRef.current?.(false);
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '9999px', padding: '0.5rem 1.5rem', fontWeight: 500 }}
+          >
+            Submit Quiz <CheckCircle style={{ width: '1rem', height: '1rem' }} />
           </GlassButton>
         ) : (
-          <GlassButton variant="primary" onClick={handleNext}>
-            Next Question
+          <GlassButton 
+            variant="primary" 
+            onClick={handleNext}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '9999px', padding: '0.5rem 1.5rem', fontWeight: 500 }}
+          >
+            Next Question <ArrowRight style={{ width: '1rem', height: '1rem' }} />
           </GlassButton>
         )}
       </div>

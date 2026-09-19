@@ -113,148 +113,203 @@ export function LocalQuizExtractionModal({ quiz, onClose }: { quiz: Quiz, onClos
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background/90 backdrop-blur-md flex items-center justify-center p-4">
-      <GlassCard className="w-full max-w-5xl p-0 flex flex-col max-h-[95vh]">
-        <div className="p-6 border-b border-glass-highlight flex justify-between items-center bg-glass-highlight/30">
+    <div className="modal-overlay" style={{ zIndex: 60 }}>
+      <GlassCard className="modal-content" style={{ maxWidth: '56rem', padding: 0, display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
+        <div className="d-flex justify-between items-center p-6 border-b border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
           <div>
-            <h3 className="text-xl font-bold flex items-center gap-2"><FileText className="text-primary" /> Local Quiz Extractor</h3>
-            <p className="text-sm text-muted-foreground">Extract questions from PDF or Image offline (No API required)</p>
+            <h3 className="font-bold text-xl d-flex items-center gap-2" style={{ color: 'var(--color-foreground)' }}>
+              <FileText style={{ color: 'var(--color-primary)' }} /> Local Quiz Extractor
+            </h3>
+            <p className="text-sm font-medium text-muted mt-1">Extract questions from PDF or Image offline (No API required)</p>
           </div>
-          <button onClick={onClose}><X className="h-5 w-5" /></button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-muted-foreground)' }}>
+            <X style={{ height: '1.25rem', width: '1.25rem' }} />
+          </button>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-6">
-          {!draftQuestions ? (
-            <div className="max-w-md mx-auto py-12 space-y-8">
-              <div className="text-center">
-                <UploadCloud className="h-16 w-16 mx-auto mb-4 text-primary opacity-50" />
-                <h4 className="text-lg font-semibold">Upload Document</h4>
-                <p className="text-sm text-muted-foreground">Supported formats: PDF, JPG, PNG, WEBP</p>
-              </div>
-
-              <div className="p-4 rounded-xl border border-glass-highlight bg-glass/20">
-                <input 
-                  type="file" 
-                  accept=".pdf,image/*" 
-                  className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30"
-                  onChange={e => setFile(e.target.files?.[0] || null)}
-                />
+        <div className="d-flex gap-6 p-6" style={{ flex: 1, overflowY: 'hidden' }}>
+          
+          {/* Controls - Only show when no draft questions exist */}
+          {!draftQuestions && (
+            <div style={{ width: '100%' }}>
+              <div className="form-group mb-6">
+                <label className="form-label mb-3 block">Source File (PDF or Image)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                  <label className="cursor-pointer m-0">
+                    <div className={`btn ${file ? 'btn-danger' : 'btn-primary'} shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 flex items-center gap-2 px-6`} style={{ opacity: isProcessing ? 0.5 : 1, pointerEvents: isProcessing ? 'none' : 'auto' }}>
+                      <UploadCloud size={20} />
+                      <span>{file ? 'Wrong file! choose another one' : 'choose a file'}</span>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept=".pdf,image/*" 
+                      style={{ display: 'none' }} 
+                      onChange={e => setFile(e.target.files?.[0] || null)}
+                      disabled={isProcessing}
+                    />
+                  </label>
+                  
+                  {file && (
+                    <div 
+                      className="text-sm font-medium px-4 py-2"
+                      style={{ 
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)', 
+                        border: '1px solid rgba(34, 197, 94, 0.4)',
+                        color: 'rgb(22, 163, 74)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        maxWidth: '250px',
+                        borderRadius: '0.75rem'
+                      }}
+                    >
+                      <FileText size={16} className="shrink-0" />
+                      <span className="truncate">{file.name}</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {isProcessing && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium text-primary animate-pulse">{progressText}</span>
+                <div className="mb-4">
+                  <div className="d-flex justify-between text-xs mb-1 font-bold">
+                    <span>{progressText}</span>
                     <span>{Math.round(progressValue)}%</span>
                   </div>
-                  <div className="w-full h-2 bg-glass-highlight rounded-full overflow-hidden">
-                    <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progressValue}%` }}></div>
+                  <div style={{ width: '100%', height: '0.5rem', background: 'rgba(255,255,255,0.1)', borderRadius: '1rem', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', background: 'var(--color-primary)', transition: 'all 0.3s', width: `${progressValue}%` }}></div>
                   </div>
                 </div>
               )}
 
-              <GlassButton variant="primary" className="w-full" onClick={handleProcess} disabled={isProcessing || !file}>
+              <GlassButton variant="primary" className="w-full gap-2 mt-4" onClick={handleProcess} disabled={isProcessing || !file}>
                 {isProcessing ? 'Processing...' : 'Start Extraction'}
               </GlassButton>
             </div>
-          ) : (
-            <div className="space-y-6 pb-12">
-              <div className="flex justify-between items-end border-b border-glass-highlight pb-4">
-                <div>
-                  <h4 className="font-bold text-xl">Review Extracted Questions</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Found {draftQuestions.length} questions. Please review and fix any OCR errors.
-                  </p>
+          )}
+
+          {/* Preview - Only show when draft questions exist */}
+          {draftQuestions && (
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+              <div className="d-flex flex-col gap-6 pb-12">
+                <div className="d-flex justify-between items-center mb-4 border-b border-white/10 pb-4">
+                  <div>
+                    <h4 className="font-bold text-lg">Review Extracted Questions</h4>
+                    <p className="text-sm text-muted mt-1">
+                      Found {draftQuestions.length} questions. Please review and fix any OCR errors.
+                    </p>
+                  </div>
                 </div>
-                <GlassButton variant="primary" onClick={handleSave} disabled={isSaving}>
-                  {isSaving ? 'Saving...' : 'Save to Quiz'}
-                </GlassButton>
+
+                {draftQuestions.length === 0 ? (
+                  <div className="empty-state" style={{ height: '200px' }}>
+                    <p className="empty-state-desc">No questions could be extracted. Please ensure the document is clear.</p>
+                  </div>
+                ) : (
+                  <div className="d-flex flex-col gap-6">
+                    {draftQuestions.map((q, qIdx) => (
+                      <div key={q.id} className="p-5 relative" style={{ background: 'rgba(0,0,0,0.03)', border: '2px solid rgba(0,0,0,0.15)', borderRadius: '1rem' }}>
+                        {q.validationWarning && (
+                          <div className="mb-4 p-3 rounded-lg text-sm font-semibold d-flex items-center gap-2" style={{ background: 'rgba(245,158,11,0.2)', color: 'var(--color-warning)', border: '1px solid rgba(245,158,11,0.5)' }}>
+                            <AlertTriangle style={{ height: '1rem', width: '1rem' }} />
+                            {q.validationWarning}
+                          </div>
+                        )}
+                        
+                        <div className="d-flex gap-4 mb-4">
+                          <div style={{ flex: '1 1 33%' }}>
+                            <label className="form-label text-xs">Type</label>
+                            <select 
+                              className="form-input w-full h-9 px-3" 
+                              value={q.question_type} 
+                              onChange={e => updateQuestion(qIdx, { question_type: e.target.value as any })}
+                            >
+                              <option value="mcq">Multiple Choice</option>
+                              <option value="true_false">True / False</option>
+                              <option value="short_answer">Short Answer</option>
+                            </select>
+                          </div>
+                          <div style={{ width: '6rem' }}>
+                            <label className="form-label text-xs">Marks</label>
+                            <GlassInput type="number" min="1" value={q.marks} onChange={e => updateQuestion(qIdx, { marks: Number(e.target.value) })} />
+                          </div>
+                          <div className="ml-auto d-flex items-end">
+                             <GlassButton variant="ghost" size="sm" className="text-danger" onClick={() => setDraftQuestions(draftQuestions.filter((_, i) => i !== qIdx))}>
+                               <Trash2 style={{ height: '1rem', width: '1rem' }} />
+                             </GlassButton>
+                          </div>
+                        </div>
+
+                        <div className="form-group mb-4">
+                          <label className="form-label text-xs font-bold text-primary">Question {qIdx + 1}</label>
+                          <textarea 
+                            className="form-input w-full mt-1"
+                            style={{ minHeight: '60px', resize: 'vertical' }}
+                            value={q.question_text} 
+                            onChange={e => updateQuestion(qIdx, { question_text: e.target.value })} 
+                          />
+                        </div>
+
+                        {q.question_type === 'mcq' && q.options && (
+                          <div className="pl-4 d-flex flex-col gap-2" style={{ borderLeft: '2px solid rgba(0,0,0,0.1)' }}>
+                            <label className="form-label text-xs">Options (Select Correct)</label>
+                            {q.options.map((opt, oIdx) => (
+                              <div key={oIdx} className="d-flex items-center gap-2">
+                                <input 
+                                  type="radio" 
+                                  name={`correct-${q.id}`} 
+                                  checked={opt.is_correct} 
+                                  onChange={() => setCorrectOption(qIdx, oIdx)} 
+                                  style={{ accentColor: 'var(--color-primary)', width: '1rem', height: '1rem' }} 
+                                />
+                                <span className="font-bold text-sm text-muted w-4 text-center">{String.fromCharCode(65 + oIdx)}.</span>
+                                <input 
+                                  type="text"
+                                  className="form-input flex-1 h-9 px-3"
+                                  style={opt.is_correct ? { borderColor: 'rgba(16,185,129,0.5)', background: 'rgba(16,185,129,0.1)', color: '#064e3b', fontWeight: '500' } : {}}
+                                  value={opt.option_text} 
+                                  onChange={e => updateOption(qIdx, oIdx, e.target.value)} 
+                                />
+                                <GlassButton 
+                                  variant="ghost" size="sm" className="text-danger px-2 py-0" 
+                                  onClick={() => updateQuestion(qIdx, { options: q.options!.filter((_, i) => i !== oIdx) })}
+                                >
+                                  <X style={{ height: '1rem', width: '1rem' }} />
+                                </GlassButton>
+                              </div>
+                            ))}
+                            <GlassButton variant="secondary" size="sm" className="w-fit mt-2" onClick={() => updateQuestion(qIdx, { options: [...q.options!, { option_text: '', is_correct: false }] })}>
+                              <Plus style={{ height: '0.75rem', width: '0.75rem', marginRight: '0.25rem' }} /> Add Option
+                            </GlassButton>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-
-              {draftQuestions.length === 0 ? (
-                <div className="text-center p-12 text-muted-foreground">
-                  No questions could be extracted. Please ensure the document is clear.
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {draftQuestions.map((q, qIdx) => (
-                    <div key={q.id} className="p-5 rounded-xl border border-glass-highlight bg-glass/20 relative">
-                      {q.validationWarning && (
-                        <div className="mb-4 p-3 rounded-lg bg-warning/20 border border-warning/50 text-warning text-sm font-semibold flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4" />
-                          {q.validationWarning}
-                        </div>
-                      )}
-                      
-                      <div className="flex gap-4 mb-4">
-                        <div className="w-1/3">
-                          <label className="block text-xs font-medium mb-1 text-muted-foreground">Type</label>
-                          <select 
-                            className="w-full h-9 px-3 rounded-lg border border-glass-highlight bg-glass/50 text-sm focus:outline-none" 
-                            value={q.question_type} 
-                            onChange={e => updateQuestion(qIdx, { question_type: e.target.value as any })}
-                          >
-                            <option value="mcq">Multiple Choice</option>
-                            <option value="true_false">True / False</option>
-                            <option value="short_answer">Short Answer</option>
-                          </select>
-                        </div>
-                        <div className="w-24">
-                          <label className="block text-xs font-medium mb-1 text-muted-foreground">Marks</label>
-                          <GlassInput type="number" min="1" value={q.marks} onChange={e => updateQuestion(qIdx, { marks: Number(e.target.value) })} />
-                        </div>
-                        <div className="ml-auto">
-                           <GlassButton variant="ghost" size="sm" className="text-error" onClick={() => setDraftQuestions(draftQuestions.filter((_, i) => i !== qIdx))}>
-                             <Trash2 className="h-4 w-4" />
-                           </GlassButton>
-                        </div>
-                      </div>
-
-                      <div className="mb-4">
-                        <label className="block text-xs font-medium mb-1 text-muted-foreground">Question Text</label>
-                        <textarea 
-                          className="w-full min-h-[60px] px-3 py-2 rounded-lg border border-glass-highlight bg-glass/50 text-sm focus:outline-none focus:border-primary resize-y" 
-                          value={q.question_text} 
-                          onChange={e => updateQuestion(qIdx, { question_text: e.target.value })} 
-                        />
-                      </div>
-
-                      {q.question_type === 'mcq' && q.options && (
-                        <div className="pl-4 border-l-2 border-glass-highlight space-y-2">
-                          <label className="block text-xs font-medium text-muted-foreground">Options (Select Correct)</label>
-                          {q.options.map((opt, oIdx) => (
-                            <div key={oIdx} className="flex items-center gap-2">
-                              <input 
-                                type="radio" 
-                                name={`correct-${q.id}`} 
-                                checked={opt.is_correct} 
-                                onChange={() => setCorrectOption(qIdx, oIdx)} 
-                                className="w-4 h-4 accent-primary" 
-                              />
-                              <input 
-                                type="text"
-                                className={`flex-1 h-9 px-3 rounded-lg border text-sm focus:outline-none ${opt.is_correct ? 'border-success/50 bg-success/10 text-success' : 'border-glass-highlight bg-glass/50'}`}
-                                value={opt.option_text} 
-                                onChange={e => updateOption(qIdx, oIdx, e.target.value)} 
-                              />
-                              <GlassButton 
-                                variant="ghost" size="sm" className="text-error px-2 py-0" 
-                                onClick={() => updateQuestion(qIdx, { options: q.options!.filter((_, i) => i !== oIdx) })}
-                              >
-                                X
-                              </GlassButton>
-                            </div>
-                          ))}
-                          <GlassButton variant="secondary" size="sm" onClick={() => updateQuestion(qIdx, { options: [...q.options!, { option_text: '', is_correct: false }] })}>
-                            <Plus className="h-3 w-3 mr-1" /> Add Option
-                          </GlassButton>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 flex justify-end gap-3" style={{ background: 'rgba(0,0,0,0.02)', borderTop: '1px solid rgba(0,0,0,0.1)' }}>
+          <GlassButton variant="ghost" onClick={onClose}>Cancel</GlassButton>
+          {draftQuestions && draftQuestions.length > 0 && (
+            <GlassButton variant="primary" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Save to Quiz'}
+            </GlassButton>
+          )}
+          {draftQuestions && (
+            <GlassButton 
+              variant="danger" 
+              onClick={() => {
+                setDraftQuestions(null);
+                setFile(null);
+              }}
+            >
+              Choosed the wrong file ?
+            </GlassButton>
           )}
         </div>
       </GlassCard>

@@ -38,19 +38,29 @@ import { AdminQuizzes } from './pages/admin/AdminQuizzes';
 import { Approvals } from './pages/admin/Approvals';
 import { AdminResults } from './pages/admin/AdminResults';
 import { AdminResultDetails } from './pages/admin/AdminResultDetails';
+import { AdminStudents } from './pages/admin/AdminStudents';
 
 import { RootAdminPortal } from './pages/admin/RootAdminPortal';
 
+import { GlassCard } from './components/ui/GlassCard';
+
 // Generic placeholder for unimplemented admin routes
 const AdminPlaceholder = ({ title }: { title: string }) => (
-  <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-    <div className="h-20 w-20 bg-muted/30 rounded-full flex items-center justify-center mb-6">
-      <span className="text-4xl text-muted-foreground opacity-50">🚧</span>
-    </div>
-    <h2 className="text-2xl font-bold mb-2">{title} Management</h2>
-    <p className="text-muted-foreground max-w-md">
-      This section is structurally prepared but the detailed UI will be implemented in subsequent phases.
-    </p>
+  <div className="dashboard-container" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <GlassCard className="d-flex flex-col items-center justify-center p-12 text-center shadow-sm" style={{ maxWidth: '32rem', width: '100%' }}>
+      <div className="empty-state-icon" style={{ marginBottom: '1.5rem', height: '4rem', width: '4rem' }}>
+        <span style={{ fontSize: '2rem' }}>🚧</span>
+      </div>
+      <h2 className="dashboard-title mb-4" style={{ fontSize: '1.75rem' }}>{title}</h2>
+      <p className="font-bold text-xl" style={{ 
+        background: 'linear-gradient(to right, var(--color-primary), #38bdf8)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textShadow: '0 4px 14px rgba(99, 102, 241, 0.2)'
+      }}>
+        Will be available soon........
+      </p>
+    </GlassCard>
   </div>
 );
 
@@ -97,10 +107,8 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/lecture/:lectureId" element={<Lecture />} />
         </Route>
-
-        {/* Lecture is full screen, different layout */}
-        <Route path="/lecture/:lectureId" element={<Lecture />} />
       </Route>
 
       {/* Compiler Construction Full Project Route - Accessible by students and teachers */}
@@ -115,7 +123,7 @@ function App() {
           <Route path="assignments" element={<AdminAssignments />} />
           <Route path="quizzes" element={<AdminQuizzes />} />
           <Route path="approvals" element={<Approvals />} />
-          <Route path="students" element={<AdminPlaceholder title="Students" />} />
+          <Route path="students" element={<AdminStudents />} />
           <Route path="results" element={<AdminResults />} />
           <Route path="results/:studentId" element={<AdminResultDetails />} />
           <Route path="analytics" element={<AdminPlaceholder title="Analytics" />} />

@@ -17,7 +17,7 @@ export function ForgotPassword() {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/reset-password-request', {
+      const response = await fetch('/api/auth/reset-password-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

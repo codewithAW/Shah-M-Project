@@ -13,9 +13,11 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import fs from 'fs';
 
-// Load env vars from the root .env file
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Load env vars from the root .env file (skip in Vercel)
+if (!process.env.VERCEL) {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  dotenv.config({ path: path.resolve(__dirname, '../.env') });
+}
 
 const app = express();
 app.use(helmet()); // Enforce strict security headers
@@ -1502,7 +1504,11 @@ app.post('/api/quiz/integrity-event', requireStudent, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server API listening on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Server API listening on port ${PORT}`);
+  });
+}
+
+export default app;

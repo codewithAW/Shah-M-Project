@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Trash2, Edit, PlayCircle, FileUp, Eye } from 'lucide-react';
+import { Plus, Trash2, Edit, PlayCircle, FileUp, Eye, Link as LinkIcon, FileText, Cloud } from 'lucide-react';
 import { GlassCard } from '../../components/ui/GlassCard';
 import { GlassButton } from '../../components/ui/GlassButton';
 import { GlassInput } from '../../components/ui/GlassInput';
@@ -26,9 +26,9 @@ export function AdminLectures() {
   const [isSaving, setIsSaving] = useState(false);
   const [managingResourcesFor, setManagingResourcesFor] = useState<string | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  
   const [formData, setFormData] = useState({
     title: '',
+    subject: '',
     description: '',
     video_type: 'none' as 'youtube'|'google_drive'|'external'|'none',
     video_url: '',
@@ -81,6 +81,7 @@ export function AdminLectures() {
     setThumbnailFile(null);
     setFormData({
       title: '',
+      subject: '',
       description: '',
       video_type: 'none',
       video_url: '',
@@ -95,6 +96,7 @@ export function AdminLectures() {
     setThumbnailFile(null);
     setFormData({
       title: lecture.title,
+      subject: lecture.subject || '',
       description: lecture.description || '',
       video_type: lecture.video_type,
       video_url: lecture.video_url || '',
@@ -179,42 +181,23 @@ export function AdminLectures() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this lecture?')) return;
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Are you sure you want to delete this lecture?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: 'var(--color-danger)',
+      cancelButtonColor: 'var(--color-primary)',
+      confirmButtonText: 'Yes, delete it!',
+      background: 'var(--color-glass-bg)',
+      color: 'var(--color-foreground)'
+    });
+    if (!result.isConfirmed) return;
     try {
       await lectureService.deleteLecture(id);
       await fetchLectures(selectedCourse);
     } catch (err: any) {
       Swal.fire(`Error deleting: ${err.message}`);
-    }
-  };
-
-  const moveLecture = async (index: number, direction: 'up' | 'down') => {
-    if (
-      (direction === 'up' && index === 0) || 
-      (direction === 'down' && index === lectures.length - 1)
-    ) return;
-
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    const newLectures = [...lectures];
-    
-    // Swap order values
-    const tempOrder = newLectures[index].lecture_order;
-    newLectures[index].lecture_order = newLectures[newIndex].lecture_order;
-    newLectures[newIndex].lecture_order = tempOrder;
-    
-    // Sort array for UI immediately
-    newLectures.sort((a, b) => a.lecture_order - b.lecture_order);
-    setLectures(newLectures);
-    
-    // Persist to DB
-    try {
-      await lectureService.updateLectureOrders([
-        { id: newLectures[index].id, lecture_order: newLectures[index].lecture_order },
-        { id: newLectures[newIndex].id, lecture_order: newLectures[newIndex].lecture_order }
-      ]);
-    } catch (err) {
-      Swal.fire("Error saving new order. Refreshing data.");
-      fetchLectures(selectedCourse);
     }
   };
 
@@ -228,91 +211,101 @@ export function AdminLectures() {
     }
   };
 
-  if (isLoading) return <div className="flex justify-center p-12"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>;
+  if (isLoading) {
+    return (
+      <div className="d-flex items-center justify-center p-12">
+        <div className="animate-spin h-8 w-8 rounded-full" style={{ border: '4px solid var(--color-primary)', borderTopColor: 'transparent' }}></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="dashboard-container">
+      <div className="dashboard-header d-flex justify-between items-center flex-wrap gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Lectures</h2>
-          <p className="text-muted-foreground">Manage your course content</p>
+          <h2 className="dashboard-title text-2xl font-bold" style={{ color: 'var(--color-foreground)' }}>Lectures</h2>
+          <p className="font-medium mt-1" style={{ color: 'var(--color-muted-foreground)' }}>Manage your course content</p>
         </div>
         
-        <div className="w-full sm:w-auto flex gap-4 items-center">
+        <div className="d-flex gap-4 items-center flex-row">
           <select 
-            className="w-full sm:w-64 h-10 px-4 rounded-xl border border-glass-highlight bg-glass/80 backdrop-blur-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+            className="form-input admin-header-select"
+            style={{ width: '100%', maxWidth: '16rem' }}
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
           >
-            <option value="" disabled className="bg-background text-foreground">Select a course</option>
+            <option value="" disabled style={{ background: 'var(--color-background)', color: 'var(--color-foreground)' }}>Select a course</option>
             {courses.map(c => (
-              <option key={c.id} value={c.id} className="bg-background text-foreground">{c.title}</option>
+              <option key={c.id} value={c.id} style={{ background: 'var(--color-background)', color: 'var(--color-foreground)' }}>{c.title}</option>
             ))}
           </select>
-          <GlassButton variant="primary" className="gap-2 shrink-0" onClick={handleOpenCreateModal} disabled={!selectedCourse}>
-            <Plus className="h-4 w-4" /> Add Lecture
+          <GlassButton className="gap-2 shadow-sm admin-header-btn" onClick={handleOpenCreateModal} disabled={!selectedCourse} style={{ flexShrink: 0 }}>
+            <Plus style={{ height: '1.25rem', width: '1.25rem' }} /> Add Lecture
           </GlassButton>
         </div>
       </div>
 
-      <GlassCard className="p-4 sm:p-6 min-h-[400px]">
+      <GlassCard className="p-6" style={{ minHeight: '400px' }}>
         {!selectedCourse ? (
-          <div className="h-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <PlayCircle className="h-12 w-12 mb-4 opacity-20" />
-            <p>Select a course to view and manage its lectures.</p>
+          <div className="empty-state">
+            <div className="empty-state-icon">
+              <PlayCircle style={{ height: '3rem', width: '3rem', opacity: 0.5 }} />
+            </div>
+            <p className="empty-state-desc">Select a course to view and manage its lectures.</p>
           </div>
         ) : isLoading ? (
-          <div className="flex justify-center p-12"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>
+          <div className="d-flex items-center justify-center p-12">
+            <div className="animate-spin h-8 w-8 rounded-full" style={{ border: '4px solid var(--color-primary)', borderTopColor: 'transparent' }}></div>
+          </div>
         ) : lectures.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <p>No lectures added yet. Click 'Add Lecture' to create one.</p>
+          <div className="empty-state">
+            <p className="empty-state-desc">No lectures added yet. Click 'Add Lecture' to create one.</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {lectures.map((lecture, idx) => (
-              <div key={lecture.id} className="flex items-center gap-4 p-4 rounded-xl border border-glass-highlight bg-glass/30 hover:bg-glass/50 transition-colors group">
-                <div className="flex flex-col gap-1 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors">
-                  <button onClick={() => moveLecture(idx, 'up')} disabled={idx === 0} className="hover:text-primary disabled:opacity-0">▲</button>
-                  <button onClick={() => moveLecture(idx, 'down')} disabled={idx === lectures.length - 1} className="hover:text-primary disabled:opacity-0">▼</button>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-foreground flex items-center gap-3">
-                    <span className="text-muted-foreground w-6 font-mono text-sm">{lecture.lecture_order}.</span> 
+          <div className="d-flex flex-col gap-4">
+              {lectures.map((lecture) => (
+                <div 
+                  key={lecture.id} 
+                  className="admin-lecture-row group"
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <h4 className="admin-lecture-row-title">
+                    <span className="text-muted text-sm" style={{ fontFamily: 'monospace' }}>{lecture.lecture_order}.</span> 
                     {lecture.thumbnail_url ? (
-                      <img src={lecture.thumbnail_url} alt="thumbnail" className="w-12 h-8 object-cover rounded shadow-sm shrink-0" />
+                      <img src={lecture.thumbnail_url} alt="thumbnail" style={{ width: '3.5rem', height: '2.5rem', objectFit: 'cover', borderRadius: 'var(--radius-lg)', flexShrink: 0 }} />
                     ) : (
-                      <div className="w-12 h-8 bg-glass/20 rounded shadow-sm shrink-0 flex items-center justify-center border border-glass-highlight overflow-hidden">
-                        <span className="text-[8px] text-muted-foreground/60 uppercase text-center leading-[10px] font-medium tracking-tighter">No<br/>Preview</span>
+                      <div className="d-flex items-center justify-center" style={{ width: '3.5rem', height: '2.5rem', background: 'rgba(255,255,255,0.1)', borderRadius: 'var(--radius-lg)', flexShrink: 0 }}>
+                        <span style={{ fontSize: '9px', color: 'var(--color-muted-foreground)', textTransform: 'uppercase', textAlign: 'center', lineHeight: '10px', fontWeight: 'bold' }}>No<br/>Preview</span>
                       </div>
                     )}
-                    {lecture.title}
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{lecture.title}</span>
                     {lecture.status === 'published' ? (
-                      <GlassBadge variant="success" className="text-[10px] px-2 py-0">Published</GlassBadge>
+                      <GlassBadge variant="success" style={{ fontSize: '10px', textTransform: 'uppercase', flexShrink: 0 }}>Published</GlassBadge>
                     ) : (
-                      <GlassBadge variant="warning" className="text-[10px] px-2 py-0">Draft</GlassBadge>
+                      <GlassBadge variant="warning" style={{ fontSize: '10px', textTransform: 'uppercase', flexShrink: 0 }}>Draft</GlassBadge>
                     )}
                   </h4>
-                  <p className="text-sm text-muted-foreground truncate ml-9">{lecture.description || 'No description'}</p>
+                  <p className="text-sm text-muted font-medium mt-2" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lecture.description || 'No description'}</p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="admin-lecture-row-actions">
                   <GlassButton variant="ghost" size="sm" onClick={() => handleStatusToggle(lecture)}>
                     {lecture.status === 'published' ? 'Unpublish' : 'Publish'}
                   </GlassButton>
                   {lecture.video_url && (
                     <a href={lecture.video_url} target="_blank" rel="noopener noreferrer">
-                      <GlassButton variant="ghost" size="sm" className="h-8 w-8 p-0 text-foreground" title="View Video">
-                        <Eye className="h-4 w-4" />
+                      <GlassButton variant="ghost" size="sm" className="btn-icon text-foreground" title="View Video">
+                        <Eye style={{ height: '1rem', width: '1rem' }} />
                       </GlassButton>
                     </a>
                   )}
-                  <GlassButton variant="ghost" size="sm" className="h-8 w-8 p-0 text-accent" onClick={() => setManagingResourcesFor(lecture.id)} title="Manage Resources">
-                    <FileUp className="h-4 w-4" />
+                  <GlassButton variant="ghost" size="sm" className="btn-icon text-accent" onClick={() => setManagingResourcesFor(lecture.id)} title="Manage Resources">
+                    <FileUp style={{ height: '1rem', width: '1rem' }} />
                   </GlassButton>
-                  <GlassButton variant="ghost" size="sm" className="h-8 w-8 p-0 text-primary" onClick={() => handleOpenEditModal(lecture)}>
-                    <Edit className="h-4 w-4" />
+                  <GlassButton variant="ghost" size="sm" className="btn-icon text-primary" onClick={() => handleOpenEditModal(lecture)}>
+                    <Edit style={{ height: '1rem', width: '1rem' }} />
                   </GlassButton>
-                  <GlassButton variant="ghost" size="sm" className="h-8 w-8 p-0 text-error hover:bg-error/10" onClick={() => handleDelete(lecture.id)}>
-                    <Trash2 className="h-4 w-4" />
+                  <GlassButton variant="ghost" size="sm" className="btn-icon text-danger" onClick={() => handleDelete(lecture.id)}>
+                    <Trash2 style={{ height: '1rem', width: '1rem' }} />
                   </GlassButton>
                 </div>
               </div>
@@ -323,78 +316,168 @@ export function AdminLectures() {
 
       {/* Create/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <GlassCard className="w-full max-w-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto relative">
-            <h3 className="text-2xl font-bold mb-6">{editingLecture ? 'Edit Lecture' : 'Create New Lecture'}</h3>
-            <form onSubmit={handleSave} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1.5 ml-1">Lecture Title</label>
+        <div className="modal-overlay">
+          <GlassCard className="modal-content">
+            <h3 className="modal-title">{editingLecture ? 'Edit Lecture' : 'Create New Lecture'}</h3>
+            <form onSubmit={handleSave} className="d-flex flex-col gap-6">
+              <div className="d-flex flex-col gap-5">
+                <div className="form-group">
+                  <label className="form-label">Lecture Title</label>
                   <GlassInput required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="e.g. Introduction to Derivatives" />
                 </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1.5 ml-1">Description</label>
+                <div className="form-group">
+                  <label className="form-label">Subject</label>
+                  <GlassInput value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} placeholder="e.g. Mathematics" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Description</label>
                   <textarea 
-                    className="w-full h-24 px-4 py-3 rounded-xl border border-glass-highlight bg-glass/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none transition-colors"
+                    className="form-input"
+                    style={{ height: '6rem', resize: 'none' }}
                     value={formData.description}
                     onChange={e => setFormData({...formData, description: e.target.value})}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1.5 ml-1">Video Type</label>
-                  <select 
-                    className="w-full h-10 px-4 rounded-xl border border-glass-highlight bg-glass/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors appearance-none"
-                    value={formData.video_type}
-                    onChange={e => setFormData({...formData, video_type: e.target.value as any})}
-                  >
-                    <option value="none" className="bg-background text-foreground">No Video (Text/Resources only)</option>
-                    <option value="youtube" className="bg-background text-foreground">YouTube</option>
-                    <option value="external" className="bg-background text-foreground">External URL</option>
-                    <option value="google_drive" className="bg-background text-foreground">Google Drive (Phase 4)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1.5 ml-1">Duration</label>
-                  <GlassInput value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} placeholder="e.g. 15:30" />
-                </div>
-                {formData.video_type !== 'none' && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium mb-1.5 ml-1">Video URL {formData.video_type === 'youtube' && <span className="text-xs text-muted-foreground font-normal">(Thumbnail & Title will auto-load)</span>}</label>
-                    <GlassInput 
-                      value={formData.video_url} 
-                      onChange={e => setFormData({...formData, video_url: e.target.value})} 
-                      onBlur={handleUrlBlur}
-                      placeholder="https://..." 
-                    />
-                    {formData.thumbnail_url && !thumbnailFile && (
-                      <div className="mt-3 relative w-32 h-20 rounded-lg overflow-hidden border border-glass-highlight">
-                        <img src={formData.thumbnail_url} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                
+                {/* Divider for Video Settings */}
+                <div className="pt-2 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+                  <h4 className="font-bold text-sm mb-4" style={{ color: 'var(--color-primary)' }}>Video Settings</h4>
+                  <div className="d-flex flex-col gap-5">
+                    <div className="form-group">
+                      <label className="form-label mb-3 d-block">Video Type</label>
+                      <div className="dashboard-grid cols-2" style={{ gap: '0.75rem' }}>
+                        
+                        <div 
+                          onClick={() => setFormData({...formData, video_type: 'none'})}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all d-flex items-center gap-3 ${formData.video_type === 'none' ? 'border-primary' : 'border-white/10'}`}
+                          style={{ background: formData.video_type === 'none' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.02)' }}
+                        >
+                          <div className="d-flex items-center justify-center rounded-lg shadow-sm" style={{ width: '2.5rem', height: '2.5rem', background: 'rgba(255,255,255,0.05)', color: formData.video_type === 'none' ? 'var(--color-primary)' : 'var(--color-muted-foreground)' }}>
+                            <FileText style={{ width: '1.25rem', height: '1.25rem' }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: formData.video_type === 'none' ? 'var(--color-primary)' : 'var(--color-foreground)' }}>No Video</p>
+                            <p className="text-xs text-muted font-medium mt-0.5">Text/Resources</p>
+                          </div>
+                        </div>
+
+                        <div 
+                          onClick={() => setFormData({...formData, video_type: 'youtube'})}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all d-flex items-center gap-3 ${formData.video_type === 'youtube' ? 'border-primary' : 'border-white/10'}`}
+                          style={{ background: formData.video_type === 'youtube' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.02)' }}
+                        >
+                          <div className="d-flex items-center justify-center rounded-lg shadow-sm" style={{ width: '2.5rem', height: '2.5rem', background: 'rgba(255,255,255,0.05)', color: formData.video_type === 'youtube' ? '#ef4444' : 'var(--color-muted-foreground)' }}>
+                            <PlayCircle style={{ width: '1.25rem', height: '1.25rem' }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: formData.video_type === 'youtube' ? '#ef4444' : 'var(--color-foreground)' }}>YouTube</p>
+                            <p className="text-xs text-muted font-medium mt-0.5">Public Video</p>
+                          </div>
+                        </div>
+
+                        <div 
+                          onClick={() => setFormData({...formData, video_type: 'external'})}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all d-flex items-center gap-3 ${formData.video_type === 'external' ? 'border-primary' : 'border-white/10'}`}
+                          style={{ background: formData.video_type === 'external' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.02)' }}
+                        >
+                          <div className="d-flex items-center justify-center rounded-lg shadow-sm" style={{ width: '2.5rem', height: '2.5rem', background: 'rgba(255,255,255,0.05)', color: formData.video_type === 'external' ? 'var(--color-primary)' : 'var(--color-muted-foreground)' }}>
+                            <LinkIcon style={{ width: '1.25rem', height: '1.25rem' }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: formData.video_type === 'external' ? 'var(--color-primary)' : 'var(--color-foreground)' }}>External URL</p>
+                            <p className="text-xs text-muted font-medium mt-0.5">Direct Link</p>
+                          </div>
+                        </div>
+
+                        <div 
+                          onClick={() => setFormData({...formData, video_type: 'google_drive'})}
+                          className={`p-3 rounded-xl border cursor-pointer transition-all d-flex items-center gap-3 ${formData.video_type === 'google_drive' ? 'border-primary' : 'border-white/10'}`}
+                          style={{ background: formData.video_type === 'google_drive' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.02)' }}
+                        >
+                          <div className="d-flex items-center justify-center rounded-lg shadow-sm" style={{ width: '2.5rem', height: '2.5rem', background: 'rgba(255,255,255,0.05)', color: formData.video_type === 'google_drive' ? '#10b981' : 'var(--color-muted-foreground)' }}>
+                            <Cloud style={{ width: '1.25rem', height: '1.25rem' }} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm" style={{ color: formData.video_type === 'google_drive' ? '#10b981' : 'var(--color-foreground)' }}>Google Drive</p>
+                            <p className="text-xs text-muted font-medium mt-0.5">Phase 4</p>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    
+                    {formData.video_type !== 'none' && (
+                      <div className="form-group">
+                        <label className="form-label">Video URL {formData.video_type === 'youtube' && <span className="font-medium text-primary text-xs" style={{ textTransform: 'lowercase' }}>(Thumbnail & Title will auto-load)</span>}</label>
+                        <GlassInput 
+                          value={formData.video_url} 
+                          onChange={e => setFormData({...formData, video_url: e.target.value})} 
+                          onBlur={handleUrlBlur}
+                          placeholder="https://..." 
+                        />
+                        {formData.thumbnail_url && !thumbnailFile && (
+                          <div style={{ marginTop: 'var(--space-4)', width: '10rem', height: '6rem', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+                            <img src={formData.thumbnail_url} alt="Thumbnail preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                        )}
                       </div>
                     )}
-                  </div>
-                )}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1.5 ml-1">
-                    Custom Thumbnail <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
-                  </label>
-                  <div className="relative">
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={e => e.target.files && setThumbnailFile(e.target.files[0])}
-                      className="w-full h-10 px-3 py-2 rounded-xl border border-glass-highlight bg-glass/50 text-sm text-foreground file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 transition-colors"
-                    />
-                    {thumbnailFile && (
-                      <p className="text-xs text-success mt-2 font-medium flex items-center gap-1">
-                        Selected: {thumbnailFile.name}
-                      </p>
-                    )}
+                    
+                    <div className="form-group">
+                      <label className="form-label">Duration</label>
+                      <GlassInput value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} placeholder="e.g. 15:30" />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        Custom Thumbnail <span style={{ textTransform: 'lowercase', color: 'var(--color-muted-foreground)' }}>(Optional)</span>
+                      </label>
+                      <div className="p-5 rounded-xl border border-dashed text-center transition-all" style={{ borderColor: 'rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.02)' }}>
+                        <input 
+                          type="file" 
+                          id="thumbnail-upload"
+                          accept="image/*"
+                          onChange={e => e.target.files && setThumbnailFile(e.target.files[0])}
+                          style={{ display: 'none' }}
+                        />
+                        <label 
+                          htmlFor="thumbnail-upload" 
+                          className="cursor-pointer shadow-sm transition-all" 
+                          style={{ 
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            padding: '0.625rem 1.25rem', 
+                            background: 'rgba(99, 102, 241, 0.1)', 
+                            border: '1px solid rgba(99, 102, 241, 0.3)',
+                            color: 'var(--color-primary)', 
+                            borderRadius: '9999px', 
+                            fontSize: 'var(--font-size-sm)', 
+                            fontWeight: 'bold' 
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)';
+                          }}
+                        >
+                          <FileUp style={{ width: '1.25rem', height: '1.25rem' }} /> Choose Image File
+                        </label>
+                        {thumbnailFile && (
+                          <p className="text-xs text-success mt-3 font-bold d-flex items-center justify-center gap-1 tracking-tight">
+                            Selected: {thumbnailFile.name}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="flex justify-end gap-3 pt-4 border-t border-glass-highlight">
+              <div className="modal-footer">
                 <GlassButton type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</GlassButton>
-                <GlassButton type="submit" variant="primary" disabled={isSaving}>{isSaving ? 'Saving...' : 'Save Lecture'}</GlassButton>
+                <GlassButton type="submit" variant="primary" disabled={isSaving} className="shadow-sm">{isSaving ? 'Saving...' : 'Save Lecture'}</GlassButton>
               </div>
             </form>
           </GlassCard>
