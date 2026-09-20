@@ -198,10 +198,8 @@
   color: var(--color-foreground);
 }
 
-.dark {
-  .admin-sidebar-link:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
+.dark .admin-sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .admin-sidebar-link.is-active {
