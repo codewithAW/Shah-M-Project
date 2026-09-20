@@ -7,6 +7,7 @@
   min-height: 100vh;
   max-width: 100vw;
   overflow-x: clip;
+  isolation: isolate;
 }
 
 /* Base Main Content */
@@ -91,7 +92,7 @@
 .app-background {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
   overflow: hidden;
   background: var(--color-background);
@@ -125,6 +126,7 @@
   display: flex;
   min-height: 100vh;
   position: relative;
+  isolation: isolate;
 }
 
 .admin-sidebar-overlay {
